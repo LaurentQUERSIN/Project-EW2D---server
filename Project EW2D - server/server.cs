@@ -87,6 +87,14 @@ namespace Project_EW2D___server
         {
             PlayerInfo player = arg.Peer.GetUserData<PlayerInfo>();
             _scene.Broadcast("chat", player.name + " a quitté le combat ! (" + arg.Reason +")");
+            _scene.Broadcast("update_status", s =>
+            {
+                using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
+                {
+                    writer.Write(player.id);
+                    writer.Write(2); //StatusTypes.DISCONNECTED non supporté
+                }
+            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
             _players.Remove(player.id);
             return Task.FromResult(true);
         }
@@ -103,12 +111,10 @@ namespace Project_EW2D___server
                 var id = reader.ReadUInt32();
                 var x = reader.ReadSingle();
                 var y = reader.ReadSingle();
-                var rot = reader.ReadChar();
-                var vx = reader.ReadSingle();
-                var vy = reader.ReadSingle();
+                var rot = reader.ReadSingle();
 
                 if (_players.ContainsKey(id))
-                    _players[id].updatePosition(x, y, rot, vx, vy, _env.Clock);
+                    _players[id].updatePosition(x, y, rot, _env.Clock);
             }
         }
 
@@ -139,6 +145,28 @@ namespace Project_EW2D___server
                             }
                         }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
+                    _scene.Broadcast("update_status", s =>
+                    {
+                        using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
+                        {
+                            foreach (Player p in _players.Values)
+                            {
+                                if ( p.status == StatusTypes.ALIVE && p.life <= 0)
+                                {
+                                    p.status = StatusTypes.DEAD;
+                                    writer.Write(p.id);
+                                    writer.Write(1); //StatusTypes.DEAD non accepté
+                                }
+                                else if (p.status == StatusTypes.DEAD && lastUpdate > p.lastHit + 5000)
+                                {
+                                    p.status = StatusTypes.ALIVE;
+                                    p.life = 100;
+                                    writer.Write(p.id);
+                                    writer.Write(0); //StatusTypes.ALIVE non accepté.
+                                }
+                            }
+                        }
+                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
                 }
             }
         }

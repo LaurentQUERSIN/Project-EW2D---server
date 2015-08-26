@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Project_EW2D___server
 {
-    public abstract class Object
+    public abstract class myGameObject
     {
         protected uint _id;
         protected string _name;
         protected float _pos_x;
         protected float _pos_y;
-        protected char _rot;
+        protected float _rot;
         protected float _vect_x;
         protected float _vect_y;
         protected long _lastUpdate;
@@ -22,49 +22,46 @@ namespace Project_EW2D___server
         public string name { get { return _name; }  }
         public float pos_x {  get { return _pos_x; }  }
         public float pos_y  {  get { return _pos_y; }  }
-        public char rot  {  get { return _rot; }  }
+        public float rot  {  get { return _rot; }  }
         public float vect_x { get { return _vect_x; } }
         public float vect_y { get { return _vect_y; } }
         public long lastUpdate { get { return _lastUpdate; } }
 
     }
 
-    public class MovingObject : Object
+    public class MovingObject : myGameObject
     {
-        protected char _colorR;
-        protected char _colorB;
-        protected char _colorG;
+        protected float _colorR;
+        protected float _colorB;
+        protected float _colorG;
 
-        public char colorR { get { return _colorR; } }
-        public char colorB { get { return _colorB; } }
-        public char colorG { get { return _colorG; } }
+        public float colorR { get { return _colorR; } }
+        public float colorB { get { return _colorB; } }
+        public float colorG { get { return _colorG; } }
 
         public Weapon weapon;
     }
 
     public class Player : MovingObject
     {
+        public float lastx;
+        public float lasty;
         public int life;
-        public int shield;
         public int lastFired;
         public int lastHit;
+        public StatusTypes status;
 
-        public void updatePosition(Object player)
-        {
-            _pos_x = player.pos_x;
-            _pos_y = player.pos_y;
-            _rot = player.rot;
-            _vect_x = player.vect_x;
-            _vect_y = player.vect_y;
-        }
 
-        public void updatePosition(float x, float y, char rot, float vx, float vy, long updateTime)
+        public void updatePosition(float x, float y, float rot, long updateTime)
         {
+            _vect_x = x - lastx;
+            _vect_y = y - lasty;
+            lastx = _pos_x;
+            lasty = _pos_y;
             _pos_x = x;
             _pos_y = y;
             _rot = rot;
-            _vect_x = vx;
-            _vect_y = vy;
+
             _lastUpdate = updateTime;
         }
 
@@ -74,6 +71,8 @@ namespace Project_EW2D___server
             _name = player.name;
             _pos_x = player.pos_x;
             _pos_y = player.pos_y;
+            lastx = player.pos_x;
+            lasty = player.pos_y;
             _rot = player.rot;
             _vect_x = 0;
             _vect_y = 0;
@@ -82,6 +81,10 @@ namespace Project_EW2D___server
             _colorG = player.colorG;
             weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
             _lastUpdate = updateTime;
+            status = StatusTypes.ALIVE;
+
+            life = 100;
+
         }
     }
 
@@ -100,9 +103,6 @@ namespace Project_EW2D___server
 
     public class Bullet : MovingObject
     {
-        private DateTime _spawntime = DateTime.UtcNow;
-        public DateTime spawntime { get { return _spawntime; } }
-
         private void calculateBulletCoords(Player player)
         {
             _vect_y = (float)Math.Sin((double)player.rot) * weapon.speed;
@@ -111,7 +111,7 @@ namespace Project_EW2D___server
             _pos_y = player.pos_y + _vect_x;
         }
 
-        public Bullet(uint object_id, Player player)
+        public Bullet(uint object_id, Player player, long updateTime)
         {
             _id = object_id;
             _name = "";
@@ -121,6 +121,7 @@ namespace Project_EW2D___server
             _colorG = player.colorG;
             weapon = player.weapon;
             calculateBulletCoords(player);
+            _lastUpdate = updateTime;
         }
     }
 }
