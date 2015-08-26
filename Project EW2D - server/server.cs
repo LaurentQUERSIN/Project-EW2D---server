@@ -70,15 +70,14 @@ namespace Project_EW2D___server
 
         private Task onConnected(IScenePeerClient client)
         {
-            PlayerInfo playerinfo = client.GetUserData<PlayerInfo>();
-            _scene.Broadcast("chat", playerinfo.name + " a rejoint le combat !");
-            playerinfo.setId(_ids);
-            client.Send("getID", s => 
+            string playerinfo = client.GetUserData<string>();
+            _scene.Broadcast("chat", playerinfo + " a rejoint le combat !");
+            client.Send("getId", s => 
             {
                 using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
                     writer.Write(_ids);
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-            _players.Add(_ids, new Player(playerinfo, _env.Clock));
+            _players.Add(_ids, new Player(_ids, playerinfo, _env.Clock));
             _ids++;
             return Task.FromResult(true);
         }

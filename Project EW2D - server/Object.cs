@@ -65,20 +65,20 @@ namespace Project_EW2D___server
             _lastUpdate = updateTime;
         }
 
-        public Player(PlayerInfo player, long updateTime)
+        public Player(uint pId, string pName, long updateTime)
         {
-            _id = player.id;
-            _name = player.name;
-            _pos_x = player.pos_x;
-            _pos_y = player.pos_y;
-            lastx = player.pos_x;
-            lasty = player.pos_y;
-            _rot = player.rot;
+            _id = pId;
+            _name = pName;
+            _pos_x = 0;
+            _pos_y = 0;
+            lastx =0 ;
+            lasty = 0;
+            _rot = 0;
             _vect_x = 0;
             _vect_y = 0;
-            _colorR = player.colorR;
-            _colorB = player.colorB;
-            _colorG = player.colorG;
+            _colorR = 255;
+            _colorB = 255;
+            _colorG = 255;
             weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
             _lastUpdate = updateTime;
             status = StatusTypes.ALIVE;
