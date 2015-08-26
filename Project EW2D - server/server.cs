@@ -2,6 +2,7 @@
 using Stormancer.Core;
 using Stormancer.Plugins;
 using Stormancer.Server.Components;
+using Stormancer.Diagnostics;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -72,6 +73,7 @@ namespace Project_EW2D___server
         {
             string playerinfo = client.GetUserData<string>();
             _scene.Broadcast("chat", playerinfo + " a rejoint le combat !");
+            _scene.GetComponent<ILogger>().Info("server", "client connected with name : " + playerinfo);
             client.Send("getId", s => 
             {
                 using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
@@ -120,6 +122,7 @@ namespace Project_EW2D___server
         private void runGame()
         {
             long lastUpdate = _env.Clock;
+            _scene.GetComponent<ILogger>().Info("server", "starting game loop");
             while (_isRunning)
             {
                 if (_env.Clock - lastUpdate > 100)
