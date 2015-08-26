@@ -80,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="app.cs" />
+    <Compile Include="Status.cs" />
     <Compile Include="weapon_types.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="server.cs" />
