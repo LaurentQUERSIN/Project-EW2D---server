@@ -41,8 +41,7 @@ namespace Project_EW2D___server
             _scene.AddRoute("update_position", onUpdatePosition);
             _scene.AddRoute("chat", onReceivingMessage);
  //         _scene.AddRoute("firing_weapon", onFiringWeapon);
- //         _scene.AddRoute("colliding", onCollising);
- //         _scene.AddRoute("upadte_status", onUpdateStatus);
+ //         _scene.AddRoute("colliding", onColliding);
             _scene.Starting.Add(onStarting);
             _scene.Shuttingdown.Add(onShutdown);
             _scene.GetComponent<ILogger>().Debug("server", "configuration complete");
@@ -89,7 +88,7 @@ namespace Project_EW2D___server
         private async Task onDisconnected(DisconnectedArgs arg)
         {
             PlayerInfo player = arg.Peer.GetUserData<PlayerInfo>();
-            _scene.Broadcast("chat", player.name + " a quitté le combat ! (" + arg.Reason +")");
+            _scene.Broadcast("chat", player.name + " a quitté le combat !");
             _scene.Broadcast("update_status", s =>
             {
                 using (var writer = new BinaryWriter(s, Encoding.UTF8, false))

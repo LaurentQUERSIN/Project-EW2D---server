@@ -46,14 +46,14 @@ namespace Project_EW2D___server
 
     public class Weapon
     {
-        private int _cooldown;
+        private long _cooldown;
         private int _damage;
         private int _spread;
         private int _speed;
         private int _size;
         private string _name;
 
-        public int cooldown { get { return _cooldown; } }
+        public long cooldown { get { return _cooldown; } }
         public int damage { get { return _damage; } }
         public string name { get { return _name; } }
         public int spread { get { return _spread; } }
