@@ -46,9 +46,9 @@ namespace Project_EW2D___server
     {
         public float lastx;
         public float lasty;
-        public int life;
-        public int lastFired;
-        public int lastHit;
+        public int life = 100;
+        public int lastFired = 0;
+        public int lastHit = 0;
         public StatusTypes status;
 
 
@@ -82,8 +82,6 @@ namespace Project_EW2D___server
             weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
             _lastUpdate = updateTime;
             status = StatusTypes.ALIVE;
-
-            life = 100;
 
         }
     }
