@@ -5,6 +5,7 @@ using Stormancer.Server.Components;
 using Stormancer.Diagnostics;
 using System;
 using System.IO;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -47,11 +48,7 @@ namespace Project_EW2D___server
 
         private Task onStarting(dynamic arg)
         {
-            if (_isRunning == false)
-            {
-                _isRunning = true;
-                runGame();
-            }
+            runGame();
             return Task.FromResult(true);
         }
 
@@ -60,44 +57,44 @@ namespace Project_EW2D___server
             return Task.FromResult(true);
         }
 
-        private Task onConnecting(IScenePeerClient client)
+        private async Task onConnecting(IScenePeerClient client)
         {
             if (_isRunning == false)
                 throw new ClientException("le serveur est vérouillé.");
             else if (_players.Count >= 100)
                 throw new ClientException("le serveur est complet.");
-            return Task.FromResult(true);
         }
 
-        private Task onConnected(IScenePeerClient client)
+        private async Task onConnected(IScenePeerClient client)
         {
             string playerinfo = client.GetUserData<string>();
-            _scene.Broadcast("chat", playerinfo + " a rejoint le combat !");
-            _scene.GetComponent<ILogger>().Info("server", "client connected with name : " + playerinfo);
-            client.Send("getId", s => 
+            if (_players.Count < 100)
             {
-                using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
-                    writer.Write(_ids);
-            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-            _players.Add(_ids, new Player(_ids, playerinfo, _env.Clock));
-            _ids++;
-            return Task.FromResult(true);
+                _scene.Broadcast("chat", playerinfo + " a rejoint le combat !");
+                _scene.GetComponent<ILogger>().Info("server", "client connected with name : " + playerinfo);
+                client.Send("getId", s =>
+                {
+                    using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
+                        writer.Write(_ids);
+                }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                _players.Add(_ids, new Player(_ids, playerinfo, _env.Clock));
+                _ids++;
+            }
         }
 
-        private Task onDisconnected(DisconnectedArgs arg)
+        private async Task onDisconnected(DisconnectedArgs arg)
         {
             PlayerInfo player = arg.Peer.GetUserData<PlayerInfo>();
             _scene.Broadcast("chat", player.name + " a quitté le combat ! (" + arg.Reason +")");
             _scene.Broadcast("update_status", s =>
             {
-                using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
+                using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
                 {
                     writer.Write(player.id);
                     writer.Write(2); //StatusTypes.DISCONNECTED non supporté
                 }
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
             _players.Remove(player.id);
-            return Task.FromResult(true);
         }
 
         private void onReceivingMessage(Packet<IScenePeerClient> packet)
@@ -121,6 +118,7 @@ namespace Project_EW2D___server
 
         private void runGame()
         {
+            _isRunning = true;
             long lastUpdate = _env.Clock;
             _scene.GetComponent<ILogger>().Info("server", "starting game loop");
             while (_isRunning)
@@ -130,7 +128,7 @@ namespace Project_EW2D___server
                     lastUpdate = _env.Clock;
                     _scene.Broadcast("update_position", s =>
                     {
-                        using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
+                        using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
                         {
                             foreach (Player p in _players.Values)
                             {
@@ -149,7 +147,7 @@ namespace Project_EW2D___server
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>
                     {
-                        using (var writer = new BinaryWriter(s, Encoding.UTF8, true))
+                        using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
                         {
                             foreach (Player p in _players.Values)
                             {
