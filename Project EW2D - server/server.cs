@@ -33,6 +33,7 @@ namespace Project_EW2D___server
         public  server(ISceneHost scene)
         {
             _scene = scene;
+            _scene.GetComponent<ILogger>().Debug("server", "starting configuration");
             _env = _scene.GetComponent<IEnvironment>();
             _scene.Connecting.Add(onConnecting);
             _scene.Connected.Add(onConnected);
@@ -44,10 +45,13 @@ namespace Project_EW2D___server
  //         _scene.AddRoute("upadte_status", onUpdateStatus);
             _scene.Starting.Add(onStarting);
             _scene.Shuttingdown.Add(onShutdown);
+            _scene.GetComponent<ILogger>().Debug("server", "configuration complete");
+
         }
 
         private Task onStarting(dynamic arg)
         {
+            _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
             runGame();
             return Task.FromResult(true);
         }
@@ -71,7 +75,7 @@ namespace Project_EW2D___server
             if (_players.Count < 100)
             {
                 _scene.Broadcast("chat", playerinfo + " a rejoint le combat !");
-                _scene.GetComponent<ILogger>().Info("server", "client connected with name : " + playerinfo);
+                _scene.GetComponent<ILogger>().Debug("server", "client connected with name : " + playerinfo);
                 client.Send("getId", s =>
                 {
                     using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
@@ -120,7 +124,7 @@ namespace Project_EW2D___server
         {
             _isRunning = true;
             long lastUpdate = _env.Clock;
-            _scene.GetComponent<ILogger>().Info("server", "starting game loop");
+            _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
             while (_isRunning)
             {
                 if (_env.Clock - lastUpdate > 100)
