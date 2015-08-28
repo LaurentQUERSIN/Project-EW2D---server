@@ -70,31 +70,67 @@ namespace Project_EW2D___server
 
         private async Task onConnected(IScenePeerClient client)
         {
-            string playerinfo = client.GetUserData<string>();
+            myGameObject player = client.GetUserData<myGameObject>();
             if (_players.Count < 100)
             {
-                _scene.Broadcast("chat", playerinfo + " a rejoint le combat !");
-                _scene.GetComponent<ILogger>().Debug("server", "client connected with name : " + playerinfo);
-                client.Send("getId", s =>
+                _scene.Broadcast("chat", player.name + " a rejoint le combat !");
+                _scene.GetComponent<ILogger>().Debug("server", "client connected with name : " + player.name);
+                client.Send("get_id", s =>
                 {
                     using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
                         writer.Write(_ids);
                 }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-                _players.Add(_ids, new Player(_ids, playerinfo, _env.Clock));
+                player.setId(_ids);
+                sendConnectedPlayersToNewPeer(client);
+                sendConnexionNotification(player);
+                _players.Add(_ids, new Player(player, _env.Clock));
                 _ids++;
             }
         }
 
+        private void sendConnectedPlayersToNewPeer(IScenePeerClient client)
+        {
+            client.Send("update_status", s =>
+            {
+                using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
+                {
+                    foreach (Player p in _players.Values)
+                    {
+                        writer.Write(p.id);
+                        writer.Write(2); // StatusTypes.CONNECTED
+                        writer.Write(p.color_red);
+                        writer.Write(p.color_blue);
+                        writer.Write(p.color_green);
+                    }
+                }
+            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+        }
+
+        private void sendConnexionNotification(myGameObject p)
+        {
+            _scene.Broadcast("update_status", s =>
+            {
+                using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
+                {
+                    writer.Write(p.id);
+                    writer.Write(2); //StatusTypes.CONNECTED
+                    writer.Write(p.color_red);
+                    writer.Write(p.color_blue);
+                    writer.Write(p.color_green);
+                }
+            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
+        }
+
         private async Task onDisconnected(DisconnectedArgs arg)
         {
-            PlayerInfo player = arg.Peer.GetUserData<PlayerInfo>();
+            myGameObject player = arg.Peer.GetUserData<myGameObject>();
             _scene.Broadcast("chat", player.name + " a quitté le combat !");
             _scene.Broadcast("update_status", s =>
             {
                 using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
                 {
                     writer.Write(player.id);
-                    writer.Write(2); //StatusTypes.DISCONNECTED non supporté
+                    writer.Write(3); //StatusTypes.DISCONNECTED
                 }
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
             _players.Remove(player.id);
@@ -116,6 +152,7 @@ namespace Project_EW2D___server
 
                 if (_players.ContainsKey(id))
                     _players[id].updatePosition(x, y, rot, _env.Clock);
+                reader.Close();
             }
         }
 
@@ -159,14 +196,14 @@ namespace Project_EW2D___server
                                 {
                                     p.status = StatusTypes.DEAD;
                                     writer.Write(p.id);
-                                    writer.Write(1); //StatusTypes.DEAD non accepté
+                                    writer.Write(1); //StatusTypes.DEAD
                                 }
                                 else if (p.status == StatusTypes.DEAD && lastUpdate > p.lastHit + 5000)
                                 {
                                     p.status = StatusTypes.ALIVE;
                                     p.life = 100;
                                     writer.Write(p.id);
-                                    writer.Write(0); //StatusTypes.ALIVE non accepté.
+                                    writer.Write(0); //StatusTypes.ALIVE
                                 }
                             }
                         }

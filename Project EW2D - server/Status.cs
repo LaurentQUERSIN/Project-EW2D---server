@@ -4,5 +4,6 @@ public enum StatusTypes
 {
 	ALIVE,
 	DEAD,
+    CONNECTED,
 	DISCONNECTED
 }
