@@ -60,16 +60,17 @@ namespace Project_EW2D___server
             return Task.FromResult(true);
         }
 
-        private async Task onConnecting(IScenePeerClient client)
+        private Task onConnecting(IScenePeerClient client)
         {
-            _scene.GetComponent<ILogger>().Debug("server", "un client tente de se connecter".);
+            _scene.GetComponent<ILogger>().Debug("server", "un client tente de se connecter");
             if (_isRunning == false)
                 throw new ClientException("le serveur est vérouillé.");
             else if (_players.Count >= 100)
                 throw new ClientException("le serveur est complet.");
+            return Task.FromResult(true);
         }
 
-        private async Task onConnected(IScenePeerClient client)
+        private Task onConnected(IScenePeerClient client)
         {
             myGameObject player = client.GetUserData<myGameObject>();
             if (_players.Count < 100)
@@ -87,6 +88,7 @@ namespace Project_EW2D___server
                 _players.Add(_ids, new Player(player, _env.Clock));
                 _ids++;
             }
+            return Task.FromResult(true);
         }
 
         private void sendConnectedPlayersToNewPeer(IScenePeerClient client)
@@ -122,7 +124,7 @@ namespace Project_EW2D___server
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
         }
 
-        private async Task onDisconnected(DisconnectedArgs arg)
+        private Task onDisconnected(DisconnectedArgs arg)
         {
             myGameObject player = arg.Peer.GetUserData<myGameObject>();
             _scene.Broadcast("chat", player.name + " a quitté le combat !");
@@ -135,6 +137,7 @@ namespace Project_EW2D___server
                 }
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
             _players.Remove(player.id);
+            return Task.FromResult(true);
         }
 
         private void onReceivingMessage(Packet<IScenePeerClient> packet)
