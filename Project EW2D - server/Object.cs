@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Project_EW2D___server
 {
-    public abstract class myGameObject
+    public class myGameObject
     {
         public uint id = 0;
         public string name = "";
