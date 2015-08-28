@@ -62,6 +62,7 @@ namespace Project_EW2D___server
 
         private async Task onConnecting(IScenePeerClient client)
         {
+            _scene.GetComponent<ILogger>().Debug("server", "un client tente de se connecter".);
             if (_isRunning == false)
                 throw new ClientException("le serveur est vérouillé.");
             else if (_players.Count >= 100)
