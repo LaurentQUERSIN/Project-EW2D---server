@@ -82,7 +82,7 @@ namespace Project_EW2D___server
                     using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
                         writer.Write(_ids);
                 }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-                player.setId(_ids);
+                player.id = _ids;
                 sendConnectedPlayersToNewPeer(client);
                 sendConnexionNotification(player);
                 _players.Add(_ids, new Player(player, _env.Clock));
@@ -182,7 +182,7 @@ namespace Project_EW2D___server
                                     writer.Write(p.id);
                                     writer.Write(p.pos_x);
                                     writer.Write(p.pos_y);
-                                    writer.Write(p.rot);
+                                    writer.Write(p.rotation);
                                     writer.Write(p.vect_x);
                                     writer.Write(p.vect_y);
                                     writer.Write(p.lastUpdate);
