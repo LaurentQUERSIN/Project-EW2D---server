@@ -137,7 +137,7 @@ namespace Project_EW2D___server
             Player temp;
             _players.TryGetValue(arg.Peer.Id, out temp);
             _scene.Broadcast("chat", temp.name + " a quitté le combat !");
-            _scene.Broadcast("Player_disconncted", s =>
+            _scene.Broadcast("Player_disconnected", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, false);
                 writer.Write(temp.id);
@@ -155,13 +155,12 @@ namespace Project_EW2D___server
         {
             using (var reader = new BinaryReader(packet.Stream))
             {
-                var id = reader.ReadUInt32();
                 var x = reader.ReadSingle();
                 var y = reader.ReadSingle();
                 var rot = reader.ReadSingle();
 
-                if (_players.ContainsKey(id))
-                    _players[id].updatePosition(x, y, rot, _env.Clock);
+                if (_players.ContainsKey(packet.Connection.Id))
+                    _players[packet.Connection.Id].updatePosition(x, y, rot, _env.Clock);
                 reader.Close();
             }
         }
