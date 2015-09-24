@@ -109,7 +109,7 @@ namespace Project_EW2D___server
 
             int i = 0;
 
-            client.Send("Player_connected", s =>
+            client.Send("player_connected", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, true);
                 foreach (Player p in _players.Values)
@@ -197,7 +197,6 @@ namespace Project_EW2D___server
                                 writer.Write(p.rotation);
                                 writer.Write(p.vect_x);
                                 writer.Write(p.vect_y);
-                                writer.Write(p.lastUpdate);
                             }
                         }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
