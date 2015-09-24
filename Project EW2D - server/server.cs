@@ -161,7 +161,7 @@ namespace Project_EW2D___server
             var y = reader.ReadSingle();
             var rot = reader.ReadSingle();
 
-            _scene.GetComponent<ILogger>().Debug("receiving update from client: x: " + x + " | y: " + y);
+            _scene.GetComponent<ILogger>().Debug("test", "receiving update from client: x: " + x + " | y: " + y);
             if (_players.ContainsKey(packet.Connection.Id))
                 _players[packet.Connection.Id].updatePosition(x, y, rot, _env.Clock);
         }
