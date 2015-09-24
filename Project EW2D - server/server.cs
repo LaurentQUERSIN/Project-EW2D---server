@@ -106,9 +106,6 @@ namespace Project_EW2D___server
 
         private void sendConnectedPlayersToNewPeer(IScenePeerClient client)
         {
-
-            int i = 0;
-
             client.Send("player_connected", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, true);
@@ -122,12 +119,9 @@ namespace Project_EW2D___server
                     writer.Write(p.color_red);
                     writer.Write(p.color_blue);
                     writer.Write(p.color_green);
-                    i++;
                 }
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-
-            _scene.GetComponent<ILogger>().Debug("test", "sent " + i + " player data to newly connected player");
-        }
+       }
 
         private void sendConnexionNotification(myGameObject p)
         {
@@ -146,7 +140,7 @@ namespace Project_EW2D___server
             Player temp;
             _players.TryGetValue(arg.Peer.Id, out temp);
             _scene.Broadcast("chat", temp.name + " a quitté le combat !");
-            _scene.Broadcast("Player_disconnected", s =>
+            _scene.Broadcast("player_disconnected", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, true);
                 writer.Write(temp.id);
@@ -167,6 +161,7 @@ namespace Project_EW2D___server
             var y = reader.ReadSingle();
             var rot = reader.ReadSingle();
 
+            _scene.GetComponent<ILogger>().Debug("receiving update from client: x: " + x + " | y: " + y);
             if (_players.ContainsKey(packet.Connection.Id))
                 _players[packet.Connection.Id].updatePosition(x, y, rot, _env.Clock);
         }
