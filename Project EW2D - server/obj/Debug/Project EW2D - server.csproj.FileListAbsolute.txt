@@ -1,2 +1,3 @@
 F:\dev\Projects\Project EW2D - server\Project EW2D - server\bin\Debug\Project EW2D - server.exe.config
 F:\dev\Projects\Project EW2D - server\Project EW2D - server\obj\Debug\Project EW2D - server.csprojResolveAssemblyReference.cache
+C:\dev\visual studio\stormancer\project EW2D\Project-EW2D---server\Project EW2D - server\bin\Debug\Project EW2D - server.exe.config

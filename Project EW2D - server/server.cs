@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,8 +28,8 @@ namespace Project_EW2D___server
         private IEnvironment _env;
         private bool _isRunning = false;
         private uint _ids = 0;
-        private Dictionary<uint, Player> _players = new Dictionary<uint, Player>();
-        private Dictionary<uint, Bullet> _bullets = new Dictionary<uint, Bullet>(); 
+        private ConcurrentDictionary<uint, Player> _players = new ConcurrentDictionary<uint, Player>();
+        private ConcurrentDictionary<uint, Bullet> _bullets = new ConcurrentDictionary<uint, Bullet>(); 
 
         public  server(ISceneHost scene)
         {
@@ -38,26 +39,39 @@ namespace Project_EW2D___server
             _scene.Connecting.Add(onConnecting);
             _scene.Connected.Add(onConnected);
             _scene.Disconnected.Add(onDisconnected);
+
             _scene.AddRoute("update_position", onUpdatePosition);
             _scene.AddRoute("chat", onReceivingMessage);
- //         _scene.AddRoute("firing_weapon", onFiringWeapon);
- //         _scene.AddRoute("colliding", onColliding);
+ //           _scene.AddProcedure("firing_weapon", onFiringWeapon);
+ //           _scene.AddProcedure("colliding", onColliding);
+
             _scene.Starting.Add(onStarting);
             _scene.Shuttingdown.Add(onShutdown);
             _scene.GetComponent<ILogger>().Debug("server", "configuration complete");
 
         }
 
+        private Task _gameLoop;
         private Task onStarting(dynamic arg)
         {
             _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
-            runGame();
+            _gameLoop = runGame();
             return Task.FromResult(true);
         }
 
-        private Task onShutdown(ShutdownArgs arg)
+        private async Task onShutdown(ShutdownArgs arg)
         {
-            return Task.FromResult(true);
+            _scene.GetComponent<ILogger>().Debug("main", "the scene shuts down");
+            _isRunning = false;
+            try
+            {
+                await _gameLoop;
+
+            }
+            catch (Exception e)
+            {
+                _scene.GetComponent<ILogger>().Log(LogLevel.Error, "runtimeError", "an error occurred in the game loop", e);
+            }
         }
 
         private Task onConnecting(IScenePeerClient client)
@@ -79,13 +93,13 @@ namespace Project_EW2D___server
                 _scene.GetComponent<ILogger>().Debug("server", "client connected with name : " + player.name);
                 client.Send("get_id", s =>
                 {
-                    using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
-                        writer.Write(_ids);
+                    var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                    writer.Write(_ids);
                 }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
                 player.id = _ids;
                 sendConnectedPlayersToNewPeer(client);
                 sendConnexionNotification(player);
-                _players.Add(_ids, new Player(player, _env.Clock));
+                _players.TryAdd(_ids, new Player(player, _env.Clock));
                 _ids++;
             }
             return Task.FromResult(true);
@@ -93,50 +107,43 @@ namespace Project_EW2D___server
 
         private void sendConnectedPlayersToNewPeer(IScenePeerClient client)
         {
-            client.Send("update_status", s =>
+            client.Send("Player_connected", s =>
             {
-                using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
+                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                foreach (Player p in _players.Values)
                 {
-                    foreach (Player p in _players.Values)
-                    {
-                        writer.Write(p.id);
-                        writer.Write(2); // StatusTypes.CONNECTED
-                        writer.Write(p.color_red);
-                        writer.Write(p.color_blue);
-                        writer.Write(p.color_green);
-                    }
+                    writer.Write(p.id);
+                    writer.Write((int) p.status);
+                    writer.Write(p.color_red);
+                    writer.Write(p.color_blue);
+                    writer.Write(p.color_green);
                 }
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
         }
 
         private void sendConnexionNotification(myGameObject p)
         {
-            _scene.Broadcast("update_status", s =>
+            _scene.Broadcast("player_connected", s =>
             {
-                using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
-                {
-                    writer.Write(p.id);
-                    writer.Write(2); //StatusTypes.CONNECTED
-                    writer.Write(p.color_red);
-                    writer.Write(p.color_blue);
-                    writer.Write(p.color_green);
-                }
+                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                writer.Write(p.id);
+                writer.Write(p.color_red);
+                writer.Write(p.color_blue);
+                writer.Write(p.color_green);
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
         }
 
         private Task onDisconnected(DisconnectedArgs arg)
         {
+            Player temp;
             myGameObject player = arg.Peer.GetUserData<myGameObject>();
             _scene.Broadcast("chat", player.name + " a quitté le combat !");
-            _scene.Broadcast("update_status", s =>
+            _scene.Broadcast("Player_disconncted", s =>
             {
-                using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
-                {
-                    writer.Write(player.id);
-                    writer.Write(3); //StatusTypes.DISCONNECTED
-                }
+                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                writer.Write(player.id);
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
-            _players.Remove(player.id);
+            _players.TryRemove(player.id, out temp);
             return Task.FromResult(true);
         }
 
@@ -160,7 +167,7 @@ namespace Project_EW2D___server
             }
         }
 
-        private void runGame()
+        private async Task runGame()
         {
             _isRunning = true;
             long lastUpdate = _env.Clock;
@@ -169,53 +176,47 @@ namespace Project_EW2D___server
             {
                 if (_env.Clock - lastUpdate > 100 && _players.Count > 0)
                 {
-                    _scene.GetComponent<ILogger>().Debug("server", "update position and status");
                     lastUpdate = _env.Clock;
                     _scene.Broadcast("update_position", s =>
                     {
-                        using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
+                        var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                        foreach (Player p in _players.Values)
                         {
-                            foreach (Player p in _players.Values)
+                            if (p.lastUpdate < lastUpdate)
                             {
-                                if (p.lastUpdate < lastUpdate)
-                                {
-                                    writer.Write(p.id);
-                                    writer.Write(p.pos_x);
-                                    writer.Write(p.pos_y);
-                                    writer.Write(p.rotation);
-                                    writer.Write(p.vect_x);
-                                    writer.Write(p.vect_y);
-                                    writer.Write(p.lastUpdate);
-                                }
+                                writer.Write(p.id);
+                                writer.Write(p.pos_x);
+                                writer.Write(p.pos_y);
+                                writer.Write(p.rotation);
+                                writer.Write(p.vect_x);
+                                writer.Write(p.vect_y);
+                                writer.Write(p.lastUpdate);
                             }
                         }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>
                     {
-                        using (var writer = new BinaryWriter(s, Encoding.UTF8, false))
+                        var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                        foreach (Player p in _players.Values)
                         {
-                            foreach (Player p in _players.Values)
+                            if (p.status == StatusTypes.ALIVE && p.life <= 0)
                             {
-                                if ( p.status == StatusTypes.ALIVE && p.life <= 0)
-                                {
-                                    p.status = StatusTypes.DEAD;
-                                    writer.Write(p.id);
-                                    writer.Write(1); //StatusTypes.DEAD
-                                }
-                                else if (p.status == StatusTypes.DEAD && lastUpdate > p.lastHit + 5000)
-                                {
-                                    p.status = StatusTypes.ALIVE;
-                                    p.life = 100;
-                                    writer.Write(p.id);
-                                    writer.Write(0); //StatusTypes.ALIVE
-                                }
+                                p.status = StatusTypes.DEAD;
+                                writer.Write(p.id);
+                                writer.Write(1); //StatusTypes.DEAD
+                            }
+                            else if (p.status == StatusTypes.DEAD && lastUpdate > p.lastHit + 5000)
+                            {
+                                p.status = StatusTypes.ALIVE;
+                                p.life = 100;
+                                writer.Write(p.id);
+                                writer.Write(0); //StatusTypes.ALIVE
                             }
                         }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
                 }
+                await Task.Delay(100);
             }
         }
-    }
-
-    
+    } 
 }
