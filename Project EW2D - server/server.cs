@@ -184,23 +184,22 @@ namespace Project_EW2D___server
                 if (_env.Clock - lastUpdate > 100 && _players.Count > 0)
                 {
                     lastUpdate = _env.Clock;
-                    foreach (Player p in _players.Values)
+                    _scene.Broadcast("update_position", s =>
                     {
-                        _scene.Broadcast("update_position", s =>
-                          {
-                              var writer = new BinaryWriter(s, Encoding.UTF8, true);
-
-                              if (p.lastUpdate < lastUpdate)
-                              {
-                                  writer.Write(p.id);
-                                  writer.Write(p.pos_x);
-                                  writer.Write(p.pos_y);
-                                  writer.Write(p.rotation);
-                                  writer.Write(p.vect_x);
-                                  writer.Write(p.vect_y);
-                              }
-                          }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
-                    }
+                        var writer = new BinaryWriter(s, Encoding.UTF8, true);
+                        foreach (Player p in _players.Values)
+                        {
+                            if (p.lastUpdate < lastUpdate)
+                            {
+                                writer.Write(p.id);
+                                writer.Write(p.pos_x);
+                                writer.Write(p.pos_y);
+                                writer.Write(p.rotation);
+                                writer.Write(p.vect_x);
+                                writer.Write(p.vect_y);
+                            }
+                        }
+                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
                     _scene.Broadcast("update_status", s =>
                     {
                         var writer = new BinaryWriter(s, Encoding.UTF8, true);
@@ -220,7 +219,7 @@ namespace Project_EW2D___server
                                 writer.Write(0); //StatusTypes.ALIVE
                             }
                         }
-                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
+                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
                 }
                 await Task.Delay(100);
             }
