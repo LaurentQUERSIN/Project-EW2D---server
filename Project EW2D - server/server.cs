@@ -172,7 +172,7 @@ namespace Project_EW2D___server
             _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
             while (_isRunning)
             {
-                if (lastUpdate + 50 < _env.Clock && _players.Count > 0)
+                if (lastUpdate + 100 < _env.Clock && _players.Count > 0)
                 {
                     lastUpdate = _env.Clock;
                     _scene.Broadcast("update_position", s =>
