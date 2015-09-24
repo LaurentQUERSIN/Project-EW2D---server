@@ -180,12 +180,13 @@ namespace Project_EW2D___server
                         var writer = new BinaryWriter(s, Encoding.UTF8, true);
                         foreach (Player p in _players.Values)
                         {
-                               writer.Write(p.id);
+                                writer.Write(p.id);
                                 writer.Write(p.pos_x);
                                 writer.Write(p.pos_y);
                                 writer.Write(p.rotation);
                                 writer.Write(p.vect_x);
                                 writer.Write(p.vect_y);
+                            _scene.GetComponent<ILogger>().Debug("test", "dpos sent = x: " + p.pos_x + " | y: " + p.pos_y + " | rot: " + p.rotation + " | vx: " + p.vect_x + " | vy: " + p.vect_y);
                          }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>
