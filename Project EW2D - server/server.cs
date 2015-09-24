@@ -186,7 +186,6 @@ namespace Project_EW2D___server
                                 writer.Write(p.rotation);
                                 writer.Write(p.vect_x);
                                 writer.Write(p.vect_y);
-                            _scene.GetComponent<ILogger>().Debug("test", "dpos sent = x: " + p.pos_x + " | y: " + p.pos_y + " | rot: " + p.rotation + " | vx: " + p.vect_x + " | vy: " + p.vect_y);
                          }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>
