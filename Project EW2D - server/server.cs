@@ -93,7 +93,7 @@ namespace Project_EW2D___server
                 _scene.GetComponent<ILogger>().Debug("server", "client connected with name : " + player.name);
                 client.Send("get_id", s =>
                 {
-                    var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                    var writer = new BinaryWriter(s, Encoding.UTF8, true);
                     writer.Write(client.Id);
                 }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
                 player.id = client.Id;
@@ -106,25 +106,34 @@ namespace Project_EW2D___server
 
         private void sendConnectedPlayersToNewPeer(IScenePeerClient client)
         {
+
+            int i = 0;
+
             client.Send("Player_connected", s =>
             {
-                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                var writer = new BinaryWriter(s, Encoding.UTF8, true);
                 foreach (Player p in _players.Values)
                 {
                     writer.Write(p.id);
-                    writer.Write((int) p.status);
+                    if (p.status == StatusTypes.ALIVE)
+                        writer.Write(0);
+                    else
+                        writer.Write(1);
                     writer.Write(p.color_red);
                     writer.Write(p.color_blue);
                     writer.Write(p.color_green);
+                    i++;
                 }
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+
+            _scene.GetComponent<ILogger>().Debug("test", "sent " + i + " player data to newly connected player");
         }
 
         private void sendConnexionNotification(myGameObject p)
         {
             _scene.Broadcast("player_connected", s =>
             {
-                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                var writer = new BinaryWriter(s, Encoding.UTF8, true);
                 writer.Write(p.id);
                 writer.Write(p.color_red);
                 writer.Write(p.color_blue);
@@ -139,7 +148,7 @@ namespace Project_EW2D___server
             _scene.Broadcast("chat", temp.name + " a quitté le combat !");
             _scene.Broadcast("Player_disconnected", s =>
             {
-                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                var writer = new BinaryWriter(s, Encoding.UTF8, true);
                 writer.Write(temp.id);
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
             _players.TryRemove(temp.id, out temp);
@@ -177,7 +186,7 @@ namespace Project_EW2D___server
                     lastUpdate = _env.Clock;
                     _scene.Broadcast("update_position", s =>
                     {
-                        var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                        var writer = new BinaryWriter(s, Encoding.UTF8, true);
                         foreach (Player p in _players.Values)
                         {
                             if (p.lastUpdate < lastUpdate)
@@ -194,7 +203,7 @@ namespace Project_EW2D___server
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>
                     {
-                        var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                        var writer = new BinaryWriter(s, Encoding.UTF8, true);
                         foreach (Player p in _players.Values)
                         {
                             if (p.status == StatusTypes.ALIVE && p.life <= 0)
