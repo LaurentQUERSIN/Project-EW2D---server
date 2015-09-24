@@ -28,7 +28,7 @@ namespace Project_EW2D___server
         private IEnvironment _env;
         private bool _isRunning = false;
         private uint _ids = 0;
-        private ConcurrentDictionary<uint, Player> _players = new ConcurrentDictionary<uint, Player>();
+        private ConcurrentDictionary<long, Player> _players = new ConcurrentDictionary<long, Player>();
         private ConcurrentDictionary<uint, Bullet> _bullets = new ConcurrentDictionary<uint, Bullet>(); 
 
         public  server(ISceneHost scene)
@@ -94,13 +94,12 @@ namespace Project_EW2D___server
                 client.Send("get_id", s =>
                 {
                     var writer = new BinaryWriter(s, Encoding.UTF8, false);
-                    writer.Write(_ids);
+                    writer.Write(client.Id);
                 }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-                player.id = _ids;
+                player.id = client.Id;
                 sendConnectedPlayersToNewPeer(client);
                 sendConnexionNotification(player);
-                _players.TryAdd(_ids, new Player(player, _env.Clock));
-                _ids++;
+                _players.TryAdd(client.Id, new Player(player, _env.Clock));
             }
             return Task.FromResult(true);
         }
@@ -136,14 +135,14 @@ namespace Project_EW2D___server
         private Task onDisconnected(DisconnectedArgs arg)
         {
             Player temp;
-            myGameObject player = arg.Peer.GetUserData<myGameObject>();
-            _scene.Broadcast("chat", player.name + " a quitté le combat !");
+            _players.TryGetValue(arg.Peer.Id, out temp);
+            _scene.Broadcast("chat", temp.name + " a quitté le combat !");
             _scene.Broadcast("Player_disconncted", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, false);
-                writer.Write(player.id);
+                writer.Write(temp.id);
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
-            _players.TryRemove(player.id, out temp);
+            _players.TryRemove(temp.id, out temp);
             return Task.FromResult(true);
         }
 

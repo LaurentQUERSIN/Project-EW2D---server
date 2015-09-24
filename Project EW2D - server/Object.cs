@@ -9,7 +9,7 @@ namespace Project_EW2D___server
 {
     public class myGameObject
     {
-        public uint id = 0;
+        public long id = 0;
         public string name = "";
         public float pos_x = 0;
         public float pos_y = 0;
@@ -50,7 +50,7 @@ namespace Project_EW2D___server
         public StatusTypes status = StatusTypes.ALIVE;
         public Weapon weapon = null;
 
-        public Player(uint pId, string pName, long updateTime)
+        public Player(long pId, string pName, long updateTime)
         {
             id = pId;
             name = pName;
@@ -92,7 +92,7 @@ namespace Project_EW2D___server
             return false;
         }
 
-        public Bullet(uint object_id, Player player, long updateTime)
+        public Bullet(long object_id, Player player, long updateTime)
         {
             id = object_id;
             name = player.name + " bullet " + id.ToString();
