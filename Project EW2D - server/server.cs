@@ -162,16 +162,13 @@ namespace Project_EW2D___server
 
         private void onUpdatePosition(Packet<IScenePeerClient> packet)
         {
-            using (var reader = new BinaryReader(packet.Stream))
-            {
-                var x = reader.ReadSingle();
-                var y = reader.ReadSingle();
-                var rot = reader.ReadSingle();
+            var reader = new BinaryReader(packet.Stream);
+            var x = reader.ReadSingle();
+            var y = reader.ReadSingle();
+            var rot = reader.ReadSingle();
 
-                if (_players.ContainsKey(packet.Connection.Id))
-                    _players[packet.Connection.Id].updatePosition(x, y, rot, _env.Clock);
-                reader.Close();
-            }
+            if (_players.ContainsKey(packet.Connection.Id))
+                _players[packet.Connection.Id].updatePosition(x, y, rot, _env.Clock);
         }
 
         private async Task runGame()
@@ -199,7 +196,7 @@ namespace Project_EW2D___server
                                 writer.Write(p.vect_y);
                             }
                         }
-                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>
                     {
                         var writer = new BinaryWriter(s, Encoding.UTF8, true);
@@ -219,7 +216,7 @@ namespace Project_EW2D___server
                                 writer.Write(0); //StatusTypes.ALIVE
                             }
                         }
-                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
                 }
                 await Task.Delay(100);
             }
