@@ -159,10 +159,27 @@ namespace Project_EW2D___server
             var reader = new BinaryReader(packet.Stream);
             var x = reader.ReadSingle();
             var y = reader.ReadSingle();
-            var rot = reader.ReadSingle();
 
             if (_players.ContainsKey(packet.Connection.Id))
-                _players[packet.Connection.Id].updatePosition(x, y, rot, _env.Clock);
+                _players[packet.Connection.Id].updatePosition(x, y, _env.Clock);
+        }
+
+        private void onFiringWeapon(Packet<IScenePeerClient> packet)
+        {
+            var reader = new BinaryReader(packet.Stream);
+            var x = reader.ReadSingle();
+            var y = reader.ReadSingle();
+
+            if (_players.ContainsKey(packet.Connection.Id) &&
+                _players[packet.Connection.Id].lastFired + _players[packet.Connection.Id].weapon.cooldown < _env.Clock)
+            {
+                CreatePlayerBullet(_players[packet.Connection.Id], x, y);
+            }
+        }
+
+        private void CreatePlayerBullet(Player p, float x, float y)
+        {
+            p.weapon.Fire(p.pos_x, p.pos_y, x, y);
         }
 
         private async Task runGame()
@@ -183,9 +200,6 @@ namespace Project_EW2D___server
                                 writer.Write(p.id);
                                 writer.Write(p.pos_x);
                                 writer.Write(p.pos_y);
-                                writer.Write(p.rotation);
-                                writer.Write(p.vect_x);
-                                writer.Write(p.vect_y);
                          }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     _scene.Broadcast("update_status", s =>

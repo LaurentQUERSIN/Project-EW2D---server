@@ -29,7 +29,7 @@ namespace Project_EW2D___server
         public float last_x = 0;
         public float last_y = 0;
 
-        public void updatePosition(float x, float y, float rot, long updateTime)
+        public void updatePosition(float x, float y, long updateTime)
         {
             vect_x = x - last_x;
             vect_y = y - last_y;
@@ -37,7 +37,6 @@ namespace Project_EW2D___server
             last_y = pos_y;
             pos_x = x;
             pos_y = y;
-            rotation = rot;
             lastUpdate = updateTime;
         }
     }
@@ -75,23 +74,6 @@ namespace Project_EW2D___server
     {
         public Weapon weapon = null;
 
-        private void calculateBulletCoords(Player player)
-        {
-            vect_y = (float)Math.Sin((double)rotation) * weapon.speed;
-            vect_x = (float)Math.Cos((double)rotation) * weapon.speed;
-            pos_x = player.pos_x + vect_x * (weapon.speed * ((player.lastUpdate - lastUpdate) / 1000f));
-            pos_y = player.pos_y + vect_y * (weapon.speed * ((player.lastUpdate - lastUpdate) / 1000f));
-        }
-
-        public bool isColliding(Player p, long time)
-        {
-            float x = pos_x + (vect_x * (weapon.speed * ((time - lastUpdate) / 1000f)));
-            float y = pos_y + (vect_y * (weapon.speed * ((time - lastUpdate) / 1000f)));
-            if (p.pos_x - 100 <= x && x <= p.pos_x + 100 && p.pos_y - 100 <= y && y <= p.pos_y + 100)
-                return true;
-            return false;
-        }
-
         public Bullet(long object_id, Player player, long updateTime)
         {
             id = object_id;
@@ -101,7 +83,6 @@ namespace Project_EW2D___server
             color_blue = player.color_blue;
             color_green = player.color_green;
             weapon = player.weapon;
-            calculateBulletCoords(player);
             lastUpdate = updateTime;
         }
     }
