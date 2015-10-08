@@ -92,11 +92,11 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            vx = vx * speed * 2;
-            vy = vy * speed * 2;
+            vx = vx * speed;
+            vy = vy * speed;
 
-            bx = p.pos_x + (p.vect_x * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
-            by = p.pos_y + (p.vect_y * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
+            bx = p.pos_x + (float)vx + (p.vect_x * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
+            by = p.pos_y + (float)vy +(p.vect_y * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
 
             long id = Weapons.instance.id;
             //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, Weapons.instance.scene.GetComponent<IEnvironment>().Clock));
