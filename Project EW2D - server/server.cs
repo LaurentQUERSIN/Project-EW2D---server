@@ -172,8 +172,6 @@ namespace Project_EW2D___server
             var x = reader.ReadSingle();
             var y = reader.ReadSingle();
 
-            _scene.GetComponent<ILogger>().Debug("test", "received bullet request");
-
             if (_players.ContainsKey(id) &&
                 _players[id].lastFired + _players[id].weapon.cooldown < _env.Clock)
             {
@@ -183,8 +181,7 @@ namespace Project_EW2D___server
 
         private async void CreatePlayerBullet(Player p, float x, float y)
         {
-            _scene.GetComponent<ILogger>().Debug("test", "executing fire procedure");
-            await p.weapon.Fire(p, x, y);
+           await p.weapon.Fire(p, x, y);
         }
 
         private async Task runGame()
