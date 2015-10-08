@@ -182,6 +182,7 @@ namespace Project_EW2D___server
 
         private async void CreatePlayerBullet(Player p, float x, float y)
         {
+            _scene.GetComponent<ILogger>().Debug("test", "executing fire procedure");
             await p.weapon.Fire(p, x, y);
         }
 
