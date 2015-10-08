@@ -92,8 +92,8 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            vx = vx * speed;
-            vy = vy * speed;
+            vx = vx * speed * 2;
+            vy = vy * speed * 2;
 
             bx = bx + ((float)vx / 10);
             by = by + ((float)vy /10);
