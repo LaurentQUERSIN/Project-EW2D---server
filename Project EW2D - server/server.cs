@@ -27,7 +27,6 @@ namespace Project_EW2D___server
         private ISceneHost _scene;
         private IEnvironment _env;
         private bool _isRunning = false;
-        private uint _ids = 0;
         private ConcurrentDictionary<long, Player> _players = new ConcurrentDictionary<long, Player>();
         private ConcurrentDictionary<uint, Bullet> _bullets = new ConcurrentDictionary<uint, Bullet>(); 
 
