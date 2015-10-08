@@ -212,6 +212,7 @@ namespace Project_EW2D___server
                                 var writer = new BinaryWriter(s, Encoding.UTF8, false);
                                 writer.Write(bullet.id);
                             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+
                             Weapons.instance.bullets.TryRemove(bullet.id, out temp);
                         }
                     }
