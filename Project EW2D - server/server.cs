@@ -42,7 +42,7 @@ namespace Project_EW2D___server
 
             _scene.AddRoute("update_position", onUpdatePosition);
             _scene.AddRoute("chat", onReceivingMessage);
- //           _scene.AddProcedure("firing_weapon", onFiringWeapon);
+            _scene.AddRoute("firing_weapon", onFiringWeapon);
  //           _scene.AddProcedure("colliding", onColliding);
 
             _scene.Starting.Add(onStarting);
@@ -177,9 +177,9 @@ namespace Project_EW2D___server
             }
         }
 
-        private void CreatePlayerBullet(Player p, float x, float y)
+        private async void CreatePlayerBullet(Player p, float x, float y)
         {
-            p.weapon.Fire(p.pos_x, p.pos_y, x, y);
+            await p.weapon.Fire(p.pos_x, p.pos_y, x, y);
         }
 
         private async Task runGame()
@@ -202,26 +202,6 @@ namespace Project_EW2D___server
                                 writer.Write(p.pos_y);
                          }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
-                    _scene.Broadcast("update_status", s =>
-                    {
-                        var writer = new BinaryWriter(s, Encoding.UTF8, true);
-                        foreach (Player p in _players.Values)
-                        {
-                            if (p.status == StatusTypes.ALIVE && p.life <= 0)
-                            {
-                                p.status = StatusTypes.DEAD;
-                                writer.Write(p.id);
-                                writer.Write(1); //StatusTypes.DEAD
-                            }
-                            else if (p.status == StatusTypes.DEAD && lastUpdate > p.lastHit + 5000)
-                            {
-                                p.status = StatusTypes.ALIVE;
-                                p.life = 100;
-                                writer.Write(p.id);
-                                writer.Write(0); //StatusTypes.ALIVE
-                            }
-                        }
-                    }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE_SEQUENCED);
                 }
                 await Task.Delay(100);
             }
