@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Stormancer;
 using Stormancer.Core;
+using Stormancer.Server.Components;
 
 namespace Project_EW2D___server
 {
@@ -20,7 +22,9 @@ namespace Project_EW2D___server
     public class Weapons
     {
         public ISceneHost scene { get; set; }
-        private Dictionary<WeaponTypes, Weapon> _weapons;
+        public Dictionary<WeaponTypes, Weapon> _weapons;
+        public ConcurrentDictionary<long, Bullet> bullets = new ConcurrentDictionary<long, Bullet>();
+        public long id = 0;
 
         public Weapon getWeapon(WeaponTypes wp)
         {
@@ -70,13 +74,13 @@ namespace Project_EW2D___server
                 writer.Write(vx);
                 writer.Write(vy);
                 writer.Write(size);
-            });
+            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
         }
 
-        protected void CalcNextBullet(float px, float py, float bx, float by)
+        protected void CalcNextBullet(Player p, float bx, float by)
         {
-            double vx = (double)(bx - px);
-            double vy = (double)(by - py);
+            double vx = (double)(bx - p.pos_x);
+            double vy = (double)(by - p.pos_y);
 
             Normalize(ref vx, ref vy);
 
@@ -91,6 +95,11 @@ namespace Project_EW2D___server
             bx = bx + (float)vx;
             by = by + (float)vy;
 
+            long id = Weapons.instance.id;
+            Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, Weapons.instance.scene.GetComponent<IEnvironment>().Clock));
+            Weapons.instance.id++;
+            if (Weapons.instance.id > 2000000)
+                Weapons.instance.id = 0;
             sendBullet(bx, by, (float) vx, (float) vy);
         }
 
@@ -105,7 +114,7 @@ namespace Project_EW2D___server
 
         }
 
-        virtual public Task Fire(float player_x, float player_y, float target_x, float target_y)
+        virtual public Task Fire(Player p, float target_x, float target_y)
         {
             return Task.FromResult(true);
         }
@@ -122,9 +131,9 @@ namespace Project_EW2D___server
             spread = 0.1f;
         }
 
-        public override Task Fire(float player_x, float player_y, float target_x, float target_y)
+        public override Task Fire(Player p, float target_x, float target_y)
         {
-            CalcNextBullet(player_x, player_y, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y);
             return Task.FromResult(true);
         }
     }
@@ -141,13 +150,13 @@ namespace Project_EW2D___server
             spread = 0.05f;
         }
 
-        public override Task Fire(float player_x, float player_y, float target_x, float target_y)
+        public override Task Fire(Player p, float target_x, float target_y)
         {
-            CalcNextBullet(player_x, player_y, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y);
             Task.Delay(200);
-            CalcNextBullet(player_x, player_y, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y);
             Task.Delay(200);
-            CalcNextBullet(player_x, player_y, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y);
 
             return Task.FromResult(true);
         }
@@ -165,9 +174,9 @@ namespace Project_EW2D___server
             spread = 1;
         }
 
-        public override Task Fire(float player_x, float player_y, float target_x, float target_y)
+        public override Task Fire(Player p, float target_x, float target_y)
         {
-            CalcNextBullet(player_x, player_y, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y);
             return Task.FromResult(true);
         }
     }

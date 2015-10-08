@@ -179,7 +179,7 @@ namespace Project_EW2D___server
 
         private async void CreatePlayerBullet(Player p, float x, float y)
         {
-            await p.weapon.Fire(p.pos_x, p.pos_y, x, y);
+            await p.weapon.Fire(p, x, y);
         }
 
         private async Task runGame()
@@ -202,6 +202,19 @@ namespace Project_EW2D___server
                                 writer.Write(p.pos_y);
                          }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
+                    foreach (Bullet bullet in Weapons.instance.bullets.Values)
+                    {
+                        Bullet temp;
+                        if (bullet.lastUpdate + 40000 < _env.Clock)
+                        {
+                            _scene.Broadcast("destroy_bullet", s =>
+                            {
+                                var writer = new BinaryWriter(s, Encoding.UTF8, false);
+                                writer.Write(bullet.id);
+                            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                            Weapons.instance.bullets.TryRemove(bullet.id, out temp);
+                        }
+                    }
                 }
                 await Task.Delay(100);
             }
