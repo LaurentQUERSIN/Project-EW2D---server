@@ -47,7 +47,7 @@ namespace Project_EW2D___server
         public int lastFired = 0;
         public int lastHit = 0;
         public StatusTypes status = StatusTypes.ALIVE;
-        public Weapon weapon = null;
+        public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
 
         public Player(long pId, string pName, long updateTime)
         {
