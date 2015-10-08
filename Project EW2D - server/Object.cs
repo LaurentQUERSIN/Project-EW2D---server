@@ -47,13 +47,13 @@ namespace Project_EW2D___server
         public long lastFired = 0;
         public long lastHit = 0;
         public StatusTypes status = StatusTypes.ALIVE;
-        public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
+        public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.RAPID_FIRE);
 
         public Player(long pId, string pName, long updateTime)
         {
             id = pId;
             name = pName;
-            weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
+            weapon = Weapons.instance.getWeapon(WeaponTypes.RAPID_FIRE);
             lastUpdate = updateTime;
         }
         public Player(myGameObject obj, long updateTime)
