@@ -62,13 +62,16 @@ namespace Project_EW2D___server
 
         protected Random rand = new Random();
 
-        protected void sendBullet(float bx, float by, float vx, float vy)
+        protected void sendBullet(float bx, float by, float vx, float vy, Player p, long id)
         {
             if (Weapons.instance.scene == null)
                 return;
             Weapons.instance.scene.Broadcast("spawn_bullet", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, false);
+
+                writer.Write(id);
+                writer.Write(p.id);
                 writer.Write(bx);
                 writer.Write(by);
                 writer.Write(vx);
@@ -100,7 +103,7 @@ namespace Project_EW2D___server
             //Weapons.instance.id++;
             //if (Weapons.instance.id > 2000000)
             //    Weapons.instance.id = 0;
-            sendBullet(bx, by, (float) vx, (float) vy);
+            sendBullet(bx, by, (float) vx, (float) vy, p, id);
         }
 
         protected void Normalize(ref double x, ref double y)
