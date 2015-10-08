@@ -167,13 +167,14 @@ namespace Project_EW2D___server
         private void onFiringWeapon(Packet<IScenePeerClient> packet)
         {
             var reader = new BinaryReader(packet.Stream);
+            var id = reader.ReadInt64();
             var x = reader.ReadSingle();
             var y = reader.ReadSingle();
 
-            if (_players.ContainsKey(packet.Connection.Id) &&
-                _players[packet.Connection.Id].lastFired + _players[packet.Connection.Id].weapon.cooldown < _env.Clock)
+            if (_players.ContainsKey(id) &&
+                _players[id].lastFired + _players[id].weapon.cooldown < _env.Clock)
             {
-                CreatePlayerBullet(_players[packet.Connection.Id], x, y);
+                CreatePlayerBullet(_players[id], x, y);
             }
         }
 
