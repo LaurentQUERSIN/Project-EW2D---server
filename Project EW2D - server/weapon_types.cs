@@ -66,7 +66,7 @@ namespace Project_EW2D___server
         {
             if (Weapons.instance.scene == null)
                 return;
-            Weapons.instance.scene.Broadcast("bullet", s =>
+            Weapons.instance.scene.Broadcast("spawn_bullet", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, false);
                 writer.Write(bx);
