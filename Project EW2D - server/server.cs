@@ -174,6 +174,7 @@ namespace Project_EW2D___server
             if (_players.ContainsKey(id) &&
                 _players[id].lastFired + _players[id].weapon.cooldown < _env.Clock)
             {
+                _players[id].lastFired = _env.Clock;
                 CreatePlayerBullet(_players[id], x, y);
             }
         }

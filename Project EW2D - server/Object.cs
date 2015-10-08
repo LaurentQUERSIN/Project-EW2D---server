@@ -44,8 +44,8 @@ namespace Project_EW2D___server
     public class Player : MovingObject
     {
         public int life = 100;
-        public int lastFired = 0;
-        public int lastHit = 0;
+        public long lastFired = 0;
+        public long lastHit = 0;
         public StatusTypes status = StatusTypes.ALIVE;
         public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.STANDARD);
 
