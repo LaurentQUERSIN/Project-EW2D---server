@@ -149,16 +149,16 @@ namespace Project_EW2D___server
             cooldown = 1000;
             damage = 20;
             size = 5;
-            speed = 15;
+            speed = 10;
             spread = 0.05f;
         }
 
         public override async Task Fire(Player p, float target_x, float target_y)
         {
             CalcNextBullet(p, target_x, target_y);
-            await Task.Delay(200);
+            await Task.Delay(100);
             CalcNextBullet(p, target_x, target_y);
-            await Task.Delay(200);
+            await Task.Delay(100);
             CalcNextBullet(p, target_x, target_y);
         }
     }
