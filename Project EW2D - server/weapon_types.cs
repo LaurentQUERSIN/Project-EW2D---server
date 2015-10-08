@@ -95,8 +95,8 @@ namespace Project_EW2D___server
             vx = vx * speed;
             vy = vy * speed;
 
-            bx = bx + (float)vx;
-            by = by + (float)vy;
+            bx = bx + ((float)vx / 10);
+            by = by + ((float)vy /10);
 
             long id = Weapons.instance.id;
             //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, Weapons.instance.scene.GetComponent<IEnvironment>().Clock));
