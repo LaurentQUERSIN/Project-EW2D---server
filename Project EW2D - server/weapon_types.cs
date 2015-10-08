@@ -92,11 +92,11 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
+            bx = p.pos_x + (float)vx + (p.vect_x * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
+            by = p.pos_y + (float)vy + (p.vect_y * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
+
             vx = vx * speed;
             vy = vy * speed;
-
-            bx = p.pos_x + (float)vx + (p.vect_x * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
-            by = p.pos_y + (float)vy +(p.vect_y * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
 
             long id = Weapons.instance.id;
             //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, Weapons.instance.scene.GetComponent<IEnvironment>().Clock));
@@ -153,15 +153,13 @@ namespace Project_EW2D___server
             spread = 0.05f;
         }
 
-        public override Task Fire(Player p, float target_x, float target_y)
+        public override async Task Fire(Player p, float target_x, float target_y)
         {
             CalcNextBullet(p, target_x, target_y);
-            Task.Delay(200);
+            await Task.Delay(200);
             CalcNextBullet(p, target_x, target_y);
-            Task.Delay(200);
+            await Task.Delay(200);
             CalcNextBullet(p, target_x, target_y);
-
-            return Task.FromResult(true);
         }
     }
 
@@ -174,7 +172,26 @@ namespace Project_EW2D___server
             damage = 10;
             size = 5;
             speed = 10;
-            spread = 1;
+            spread = .25f;
+        }
+
+        public override Task Fire(Player p, float target_x, float target_y)
+        {
+            CalcNextBullet(p, target_x, target_y);
+            return Task.FromResult(true);
+        }
+    }
+
+    public class WeaponShotgun : Weapon
+    {
+        public WeaponShotgun()
+        {
+            name = "machine gun";
+            cooldown = 2000;
+            damage = 15;
+            size = 5;
+            speed = 5;
+            spread = .5f;
         }
 
         public override Task Fire(Player p, float target_x, float target_y)
