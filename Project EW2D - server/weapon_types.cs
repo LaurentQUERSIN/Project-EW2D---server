@@ -16,7 +16,7 @@ namespace Project_EW2D___server
         STANDARD,
         RAPID_FIRE,
         MACHINE_GUN,
-        MEGA_BOMB
+        SHOTGUN
     }
 
     public class Weapons
@@ -48,6 +48,7 @@ namespace Project_EW2D___server
             _weapons.Add(WeaponTypes.STANDARD, new WeaponStandard());
             _weapons.Add(WeaponTypes.RAPID_FIRE, new WeaponRapidFire());
             _weapons.Add(WeaponTypes.MACHINE_GUN, new WeaponMachineGun());
+            _weapons.Add(WeaponTypes.SHOTGUN, new WeaponShotgun());
         }
     }
 
