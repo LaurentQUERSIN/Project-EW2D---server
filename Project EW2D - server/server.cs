@@ -171,6 +171,8 @@ namespace Project_EW2D___server
             var x = reader.ReadSingle();
             var y = reader.ReadSingle();
 
+            _scene.GetComponent<ILogger>().Debug("test", "received bullet request");
+
             if (_players.ContainsKey(id) &&
                 _players[id].lastFired + _players[id].weapon.cooldown < _env.Clock)
             {
