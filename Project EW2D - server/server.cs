@@ -170,18 +170,19 @@ namespace Project_EW2D___server
             var id = reader.ReadInt64();
             var x = reader.ReadSingle();
             var y = reader.ReadSingle();
+            var time = reader.ReadInt64();
 
             if (_players.ContainsKey(id) &&
                 _players[id].lastFired + _players[id].weapon.cooldown < _env.Clock)
             {
                 _players[id].lastFired = _env.Clock;
-                CreatePlayerBullet(_players[id], x, y);
+                CreatePlayerBullet(_players[id], x, y, time);
             }
         }
 
-        private async void CreatePlayerBullet(Player p, float x, float y)
+        private async void CreatePlayerBullet(Player p, float x, float y, long time)
         {
-           await p.weapon.Fire(p, x, y);
+           await p.weapon.Fire(p, x, y, time);
         }
 
         private async Task runGame()

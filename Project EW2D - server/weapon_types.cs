@@ -80,7 +80,7 @@ namespace Project_EW2D___server
             }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
         }
 
-        protected void CalcNextBullet(Player p, float bx, float by)
+        protected void CalcNextBullet(Player p, float bx, float by, long time)
         {
             double vx = (double)(bx - p.pos_x);
             double vy = (double)(by - p.pos_y);
@@ -92,8 +92,8 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            bx = p.pos_x + (float)vx + (p.vect_x * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
-            by = p.pos_y + (float)vy + (p.vect_y * ((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - p.lastUpdate) / 1000));
+            bx = p.pos_x + (p.vect_x * (float)((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time) / 1000));
+            by = p.pos_y + (p.vect_y * (float)((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time) / 1000));
 
             vx = vx * speed;
             vy = vy * speed;
@@ -117,7 +117,7 @@ namespace Project_EW2D___server
 
         }
 
-        virtual public Task Fire(Player p, float target_x, float target_y)
+        virtual public Task Fire(Player p, float target_x, float target_y, long time)
         {
             return Task.FromResult(true);
         }
@@ -134,9 +134,9 @@ namespace Project_EW2D___server
             spread = 0.1f;
         }
 
-        public override Task Fire(Player p, float target_x, float target_y)
+        public override Task Fire(Player p, float target_x, float target_y, long time)
         {
-            CalcNextBullet(p, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y, time);
             return Task.FromResult(true);
         }
     }
@@ -153,13 +153,13 @@ namespace Project_EW2D___server
             spread = 0.05f;
         }
 
-        public override async Task Fire(Player p, float target_x, float target_y)
+        public override async Task Fire(Player p, float target_x, float target_y, long time)
         {
-            CalcNextBullet(p, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y, time);
             await Task.Delay(100);
-            CalcNextBullet(p, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y, time);
             await Task.Delay(100);
-            CalcNextBullet(p, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y, time);
         }
     }
 
@@ -175,9 +175,9 @@ namespace Project_EW2D___server
             spread = .25f;
         }
 
-        public override Task Fire(Player p, float target_x, float target_y)
+        public override Task Fire(Player p, float target_x, float target_y, long time)
         {
-            CalcNextBullet(p, target_x, target_y);
+            CalcNextBullet(p, target_x, target_y, time);
             return Task.FromResult(true);
         }
     }
