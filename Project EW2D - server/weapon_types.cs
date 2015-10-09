@@ -173,7 +173,7 @@ namespace Project_EW2D___server
             damage = 10;
             size = 5;
             speed = 10;
-            spread = .25f;
+            spread = .5f;
         }
 
         public override Task Fire(Player p, float target_x, float target_y, long time)
@@ -192,11 +192,15 @@ namespace Project_EW2D___server
             damage = 15;
             size = 5;
             speed = 5;
-            spread = .5f;
+            spread = 1f;
         }
 
         public override Task Fire(Player p, float target_x, float target_y, long time)
         {
+            CalcNextBullet(p, target_x, target_y, time);
+            CalcNextBullet(p, target_x, target_y, time);
+            CalcNextBullet(p, target_x, target_y, time);
+            CalcNextBullet(p, target_x, target_y, time);
             CalcNextBullet(p, target_x, target_y, time);
             return Task.FromResult(true);
         }
