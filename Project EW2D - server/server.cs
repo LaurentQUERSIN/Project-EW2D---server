@@ -235,10 +235,10 @@ namespace Project_EW2D___server
                     else if (p.vect_y < 0)
                         p.vect_y += 0.05f;
                 }
-                if (p.vect_y > 1f)
-                    p.vect_y = 1f;
-                if (p.vect_y < -1f)
-                    p.vect_y = -1f;
+                if (p.vect_y > 0.5f)
+                    p.vect_y = 0.5f;
+                if (p.vect_y < -0.5f)
+                    p.vect_y = -0.5f;
 
                 if (p.left == true && p.right == false)
                 {
@@ -257,10 +257,10 @@ namespace Project_EW2D___server
                     else if (p.vect_x < 0)
                         p.vect_x += 0.05f;
                 }
-                if (p.vect_x > 1f)
-                    p.vect_x = 1f;
-                if (p.vect_x < -1f)
-                    p.vect_x = -1f;
+                if (p.vect_x > 0.5f)
+                    p.vect_x = 0.5f;
+                if (p.vect_x < -0.5f)
+                    p.vect_x = -0.5f;
 
                 p.pos_x += p.vect_x;
                 p.pos_y += p.vect_y;
