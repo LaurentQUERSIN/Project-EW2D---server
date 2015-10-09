@@ -53,7 +53,7 @@ namespace Project_EW2D___server
         private Task _gameLoop;
         private Task onStarting(dynamic arg)
         {
-            Weapons.instance.scene = _scene;
+            Weapons.instance.setScene(_scene);
             _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
             _gameLoop = runGame();
             return Task.FromResult(true);
