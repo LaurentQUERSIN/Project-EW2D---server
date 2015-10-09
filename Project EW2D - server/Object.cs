@@ -60,7 +60,6 @@ namespace Project_EW2D___server
             name = pName;
             weapon = Weapons.instance.getWeapon(WeaponTypes.RAPID_FIRE);
             lastUpdate = updateTime;
-
         }
         public Player(myGameObject obj, long updateTime)
         {
