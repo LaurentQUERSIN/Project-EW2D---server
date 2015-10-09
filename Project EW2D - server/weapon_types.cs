@@ -88,19 +88,19 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            vx = vx + ((rand.NextDouble() - 1) % spread);
-            vy = vy + ((rand.NextDouble() - 1) % spread);
+            //vx = vx + ((rand.NextDouble() - 1) * spread * 2);
+            //vy = vy + ((rand.NextDouble() - 1) * spread * 2);
 
             Normalize(ref vx, ref vy);
 
-            bx = p.pos_x + (float)vx * 1.5f + (p.vect_x * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 50));
-            by = p.pos_y + (float)vy * 1.5f + (p.vect_y * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 50));
+            bx = p.pos_x + (float)vx * 1.5f; // + (p.vect_x * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 50));
+            by = p.pos_y + (float)vy * 1.5f; // + (p.vect_y * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 50));
 
             vx = vx * speed;
             vy = vy * speed;
 
             long id = Weapons.instance.id;
-            //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, time));
+            //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, bx, by, vx, vy, time));
             Weapons.instance.id++;
             if (Weapons.instance.id > 2000000)
                 Weapons.instance.id = 0;
@@ -129,9 +129,9 @@ namespace Project_EW2D___server
         {
             name = "standard gun";
             cooldown = 500;
-            damage = 50;
+            damage = 35;
             size = 10;
-            speed = 5;
+            speed = 1;
             spread = 0.1f;
         }
 
@@ -150,7 +150,7 @@ namespace Project_EW2D___server
             cooldown = 1000;
             damage = 20;
             size = 5;
-            speed = 10;
+            speed = 3;
             spread = 0.05f;
         }
 
@@ -172,7 +172,7 @@ namespace Project_EW2D___server
             cooldown = 100;
             damage = 10;
             size = 5;
-            speed = 10;
+            speed = 2;
             spread = .5f;
         }
 
@@ -191,7 +191,7 @@ namespace Project_EW2D___server
             cooldown = 2000;
             damage = 15;
             size = 5;
-            speed = 5;
+            speed = 1;
             spread = 1f;
         }
 
