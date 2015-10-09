@@ -93,8 +93,8 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            bx = p.pos_x + (float)vx * 1.5f + (p.vect_x * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 10));
-            by = p.pos_y + (float)vy * 1.5f + (p.vect_y * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 10));
+            bx = p.pos_x + (float)vx * 1.5f + (p.vect_x * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 100));
+            by = p.pos_y + (float)vy * 1.5f + (p.vect_y * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 100));
 
             vx = vx * speed;
             vy = vy * speed;
