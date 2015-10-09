@@ -227,25 +227,25 @@ namespace Project_EW2D___server
                     if (p.up == true && p.down == false)
                     {
                         p.last_y = p.pos_y;
-                        p.pos_y = p.pos_y + (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.pos_y = p.pos_y + (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
                         p.vect_y = p.pos_y - p.last_y;
                     }
                     if (p.down == true && p.up == false)
                     {
                         p.last_y = p.pos_y;
-                        p.pos_y = p.pos_y - (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.pos_y = p.pos_y - (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
                         p.vect_y = p.pos_y - p.last_y;
                     }
                     if (p.left == true && p.right == false)
                     {
                         p.last_x = p.pos_x;
-                        p.pos_x = p.pos_x - (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.pos_x = p.pos_x - (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
                         p.vect_x = p.pos_x - p.last_x;
                     }
                     if (p.right == true && p.left == false)
                     {
                         p.last_x = p.pos_x;
-                        p.pos_x = p.pos_x + (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.pos_x = p.pos_x + (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
                         p.vect_x = p.pos_x - p.last_x;
                     }
                 }
