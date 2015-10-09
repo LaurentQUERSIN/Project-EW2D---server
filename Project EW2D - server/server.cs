@@ -296,7 +296,7 @@ namespace Project_EW2D___server
             while (_isRunning)
             {
                 updatePlayersPositions();
-                if (lastUpdate + 30 < _env.Clock && _players.Count > 0)
+                if (lastUpdate + 100 < _env.Clock && _players.Count > 0)
                 {
                     lastUpdate = _env.Clock;
                     _scene.Broadcast("update_position", s =>
@@ -324,7 +324,7 @@ namespace Project_EW2D___server
                         }
                     }
                 }
-                await Task.Delay(30);
+                await Task.Delay(50);
             }
         }
     } 
