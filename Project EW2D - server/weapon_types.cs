@@ -21,7 +21,7 @@ namespace Project_EW2D___server
 
     public class Weapons
     {
-        public ISceneHost scene { get; set; }
+        private ISceneHost scene { get; set; }
         public Dictionary<WeaponTypes, Weapon> _weapons;
         public ConcurrentDictionary<long, Bullet> bullets = new ConcurrentDictionary<long, Bullet>();
         public long id = 0;
@@ -29,6 +29,17 @@ namespace Project_EW2D___server
         public Weapon getWeapon(WeaponTypes wp)
         {
             return _weapons[wp];
+        }
+
+        public long getTime()
+        {
+            return scene.GetComponent<IEnvironment>().Clock;
+        }
+
+        public void send(string route, Action<Stream> writer)
+        {
+            if (scene != null)
+                scene.Broadcast(route, writer);
         }
 
         private static Weapons _instance;
@@ -65,9 +76,7 @@ namespace Project_EW2D___server
 
         protected void sendBullet(float bx, float by, float vx, float vy, Player p, long id)
         {
-            if (Weapons.instance.scene == null)
-                return;
-            Weapons.instance.scene.Broadcast("spawn_bullet", s =>
+            Weapons.instance.send("spawn_bullet", s =>
             {
                 var writer = new BinaryWriter(s, Encoding.UTF8, false);
 
@@ -78,7 +87,7 @@ namespace Project_EW2D___server
                 writer.Write(vx);
                 writer.Write(vy);
                 writer.Write(size);
-            }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+            });
         }
 
         protected void CalcNextBullet(Player p, float bx, float by, long time)
@@ -93,8 +102,10 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            bx = p.pos_x + (float)vx * 1.5f; // + (p.vect_x * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 50));
-            by = p.pos_y + (float)vy * 1.5f; // + (p.vect_y * (float)(((Weapons.instance.scene.GetComponent<IEnvironment>().Clock - time)) / 50));
+            long clock = Weapons.instance.getTime();
+
+            bx = p.pos_x + (float)vx * 1.5f + (p.vect_x * (float)(((clock - p.lastUpdate)) / 50));
+            by = p.pos_y + (float)vy * 1.5f + (p.vect_y * (float)(((clock - p.lastUpdate)) / 50));
 
             vx = vx * speed;
             vy = vy * speed;
@@ -156,11 +167,14 @@ namespace Project_EW2D___server
 
         public override async Task Fire(Player p, float target_x, float target_y, long time)
         {
-            CalcNextBullet(p, target_x, target_y, time);
+            if (p.status == StatusTypes.ALIVE)
+                CalcNextBullet(p, target_x, target_y, time);
             await Task.Delay(100);
-            CalcNextBullet(p, target_x, target_y, time);
+            if (p.status == StatusTypes.ALIVE)
+                CalcNextBullet(p, target_x, target_y, time);
             await Task.Delay(100);
-            CalcNextBullet(p, target_x, target_y, time);
+            if (p.status == StatusTypes.ALIVE)
+                CalcNextBullet(p, target_x, target_y, time);
         }
     }
 
