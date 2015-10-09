@@ -102,8 +102,8 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            vx = vx + ((rand.NextDouble() - 1) * spread * 2);
-            vy = vy + ((rand.NextDouble() - 1) * spread * 2);
+            //vx = vx + ((rand.NextDouble() - 1) * spread * 2);
+            //vy = vy + ((rand.NextDouble() - 1) * spread * 2);
 
             Normalize(ref vx, ref vy);
 
