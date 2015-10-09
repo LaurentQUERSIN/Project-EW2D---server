@@ -100,7 +100,7 @@ namespace Project_EW2D___server
             vy = vy * speed;
 
             long id = Weapons.instance.id;
-            //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, Weapons.instance.scene.GetComponent<IEnvironment>().Clock));
+            //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, time));
             Weapons.instance.id++;
             if (Weapons.instance.id > 2000000)
                 Weapons.instance.id = 0;
