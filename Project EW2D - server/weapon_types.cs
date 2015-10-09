@@ -97,8 +97,8 @@ namespace Project_EW2D___server
 
             Normalize(ref vx, ref vy);
 
-            //vx = vx + ((rand.NextDouble() - 1) * spread * 2);
-            //vy = vy + ((rand.NextDouble() - 1) * spread * 2);
+            vx = vx + ((rand.NextDouble() - 1) * spread * 2);
+            vy = vy + ((rand.NextDouble() - 1) * spread * 2);
 
             Normalize(ref vx, ref vy);
 
@@ -142,7 +142,7 @@ namespace Project_EW2D___server
             cooldown = 500;
             damage = 35;
             size = 10;
-            speed = 1;
+            speed = 4;
             spread = 0.1f;
         }
 
@@ -159,9 +159,9 @@ namespace Project_EW2D___server
         {  
             name = "rapid fire gun";
             cooldown = 1000;
-            damage = 20;
+            damage = 15;
             size = 5;
-            speed = 3;
+            speed = 6;
             spread = 0.05f;
         }
 
@@ -186,7 +186,7 @@ namespace Project_EW2D___server
             cooldown = 100;
             damage = 10;
             size = 5;
-            speed = 2;
+            speed = 4;
             spread = .5f;
         }
 
@@ -203,9 +203,9 @@ namespace Project_EW2D___server
         {
             name = "machine gun";
             cooldown = 2000;
-            damage = 15;
+            damage = 20;
             size = 5;
-            speed = 1;
+            speed = 4;
             spread = 1f;
         }
 
