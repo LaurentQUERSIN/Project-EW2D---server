@@ -264,8 +264,29 @@ namespace Project_EW2D___server
 
                 p.pos_x += p.vect_x;
                 p.pos_y += p.vect_y;
+                if (p.pos_x < -150)
+                {
+                    p.pos_x = -150;
+                    p.vect_x = 0;
+                }
+                if (p.pos_x > 150)
+                {
+                    p.pos_x = 150;
+                    p.vect_x = 0;
+                }
+                if (p.pos_y < -100)
+                {
+                    p.pos_y = -100;
+                    p.vect_y = 0;
+                }
+                if (p.pos_y < 100)
+                {
+                    p.pos_y = 100;
+                    p.vect_y = 0;
+                }
+
             }
-            }
+        }
 
         private async Task runGame()
         {
