@@ -214,6 +214,59 @@ namespace Project_EW2D___server
             }
         }
 
+        private void updatePlayersPositions()
+        {
+            foreach (Player p in _players.Values)
+            {
+                if (p.up == true && p.down == false)
+                {
+                    p.vect_y += 0.05f;
+                }
+                if (p.down == true && p.up == false)
+                {
+                    p.vect_y -= 0.05f;
+                }
+                if ((p.up == false && p.down == false) || (p.up == true && p.down == true))
+                {
+                    if (-0.05f < p.vect_y && p.vect_y < 0.05f)
+                        p.vect_y = 0;
+                    else if (p.vect_y > 0)
+                        p.vect_y -= 0.05f;
+                    else if (p.vect_y < 0)
+                        p.vect_y += 0.05f;
+                }
+                if (p.vect_y > 1f)
+                    p.vect_y = 1f;
+                if (p.vect_y < -1f)
+                    p.vect_y = -1f;
+
+                if (p.left == true && p.right == false)
+                {
+                    p.vect_x -= 0.05f;
+                }
+                if (p.right == true && p.left == false)
+                {
+                    p.vect_x += 0.05f;
+                }
+                if ((p.left == false && p.right == false) || (p.left == true && p.right == true))
+                {
+                    if (-0.05f < p.vect_x && p.vect_x < 0.05f)
+                        p.vect_x = 0;
+                    else if (p.vect_x > 0)
+                        p.vect_x -= 0.05f;
+                    else if (p.vect_x < 0)
+                        p.vect_x += 0.05f;
+                }
+                if (p.vect_x > 1f)
+                    p.vect_x = 1f;
+                if (p.vect_x < -1f)
+                    p.vect_x = -1f;
+
+                p.pos_x += p.vect_x;
+                p.pos_y += p.vect_y;
+            }
+            }
+
         private async Task runGame()
         {
             _isRunning = true;
@@ -221,34 +274,6 @@ namespace Project_EW2D___server
             _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
             while (_isRunning)
             {
-
-                foreach(Player p in _players.Values)
-                {
-                    if (p.up == true && p.down == false)
-                    {
-                        p.last_y = p.pos_y;
-                        p.pos_y = p.pos_y + (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
-                        p.vect_y = p.pos_y - p.last_y;
-                    }
-                    if (p.down == true && p.up == false)
-                    {
-                        p.last_y = p.pos_y;
-                        p.pos_y = p.pos_y - (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
-                        p.vect_y = p.pos_y - p.last_y;
-                    }
-                    if (p.left == true && p.right == false)
-                    {
-                        p.last_x = p.pos_x;
-                        p.pos_x = p.pos_x - (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
-                        p.vect_x = p.pos_x - p.last_x;
-                    }
-                    if (p.right == true && p.left == false)
-                    {
-                        p.last_x = p.pos_x;
-                        p.pos_x = p.pos_x + (0.2f * ((_env.Clock - p.lastUpdate) / 1000));
-                        p.vect_x = p.pos_x - p.last_x;
-                    }
-                }
 
                 if (lastUpdate + 50 < _env.Clock && _players.Count > 0)
                 {
