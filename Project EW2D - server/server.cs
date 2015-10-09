@@ -279,7 +279,7 @@ namespace Project_EW2D___server
                     p.pos_y = -100;
                     p.vect_y = 0;
                 }
-                if (p.pos_y < 100)
+                if (p.pos_y > 100)
                 {
                     p.pos_y = 100;
                     p.vect_y = 0;
