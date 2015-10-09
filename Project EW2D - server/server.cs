@@ -39,8 +39,9 @@ namespace Project_EW2D___server
             _scene.Connected.Add(onConnected);
             _scene.Disconnected.Add(onDisconnected);
 
-            _scene.AddRoute("enable_action", onEnablePosition);
-            _scene.AddRoute("disable_action", onDisablePosition);
+            _scene.AddRoute("enable_action", OnEnableAction);
+            _scene.AddRoute("disable_action", OnDisableAction);
+
             _scene.AddRoute("firing_weapon", onFiringWeapon);
             _scene.AddRoute("chat", onReceivingMessage);
 
