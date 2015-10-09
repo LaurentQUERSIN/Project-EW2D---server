@@ -49,6 +49,11 @@ namespace Project_EW2D___server
         public StatusTypes status = StatusTypes.ALIVE;
         public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.MACHINE_GUN);
 
+        public bool up = false;
+        public bool down = false;
+        public bool left = false;
+        public bool right = false;
+
         public Player(long pId, string pName, long updateTime)
         {
             id = pId;
@@ -74,14 +79,13 @@ namespace Project_EW2D___server
     {
         public Weapon weapon = null;
 
-        public Bullet(long object_id, Player player, long updateTime)
+        public Bullet(long object_id, Player player, float x, float y, float vx, float vy, long updateTime)
         {
             id = object_id;
-            name = player.name + " bullet " + id.ToString();
-            rotation = player.rotation;
-            color_red = player.color_red;
-            color_blue = player.color_blue;
-            color_green = player.color_green;
+            pos_x = x;
+            pos_y = y;
+            vect_x = vx;
+            vect_y = vy;
             weapon = player.weapon;
             lastUpdate = updateTime;
         }

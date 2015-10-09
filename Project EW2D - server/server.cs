@@ -39,10 +39,10 @@ namespace Project_EW2D___server
             _scene.Connected.Add(onConnected);
             _scene.Disconnected.Add(onDisconnected);
 
-            _scene.AddRoute("update_position", onUpdatePosition);
-            _scene.AddRoute("chat", onReceivingMessage);
+            _scene.AddRoute("enable_action", onEnablePosition);
+            _scene.AddRoute("disable_action", onDisablePosition);
             _scene.AddRoute("firing_weapon", onFiringWeapon);
- //           _scene.AddProcedure("colliding", onColliding);
+            _scene.AddRoute("chat", onReceivingMessage);
 
             _scene.Starting.Add(onStarting);
             _scene.Shuttingdown.Add(onShutdown);
@@ -154,16 +154,6 @@ namespace Project_EW2D___server
             _scene.Broadcast("chat", packet.Stream);
         }
 
-        private void onUpdatePosition(Packet<IScenePeerClient> packet)
-        {
-            var reader = new BinaryReader(packet.Stream);
-            var x = reader.ReadSingle();
-            var y = reader.ReadSingle();
-
-            if (_players.ContainsKey(packet.Connection.Id))
-                _players[packet.Connection.Id].updatePosition(x, y, _env.Clock);
-        }
-
         private void onFiringWeapon(Packet<IScenePeerClient> packet)
         {
             var reader = new BinaryReader(packet.Stream);
@@ -185,6 +175,44 @@ namespace Project_EW2D___server
            await p.weapon.Fire(p, x, y, time);
         }
 
+        private void OnEnableAction(Packet<IScenePeerClient> packet)
+        {
+            var reader = new BinaryReader(packet.Stream);
+            var action = reader.ReadInt32();
+
+            Player p;
+            if (_players.TryGetValue(packet.Connection.Id, out p) == true)
+            {
+                if (action == 0)
+                    p.up = true;
+                if (action == 1)
+                    p.down = true;
+                if (action == 2)
+                    p.left = true;
+                if (action == 3)
+                    p.right = true;
+            }
+        }
+
+        private void OnDisableAction(Packet<IScenePeerClient> packet)
+        {
+            var reader = new BinaryReader(packet.Stream);
+            var action = reader.ReadInt32();
+
+            Player p;
+            if (_players.TryGetValue(packet.Connection.Id, out p) == true)
+            {
+                if (action == 0)
+                    p.up = false;
+                if (action == 1)
+                    p.down = false;
+                if (action == 2)
+                    p.left = false;
+                if (action == 3)
+                    p.right = false;
+            }
+        }
+
         private async Task runGame()
         {
             _isRunning = true;
@@ -192,7 +220,36 @@ namespace Project_EW2D___server
             _scene.GetComponent<ILogger>().Debug("server", "starting game loop");
             while (_isRunning)
             {
-                if (lastUpdate + 100 < _env.Clock && _players.Count > 0)
+
+                foreach(Player p in _players.Values)
+                {
+                    if (p.up == true && p.down == false)
+                    {
+                        p.last_y = p.pos_y;
+                        p.pos_y = p.pos_y + (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.vect_y = p.pos_y - p.last_y;
+                    }
+                    if (p.down == true && p.up == false)
+                    {
+                        p.last_y = p.pos_y;
+                        p.pos_y = p.pos_y - (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.vect_y = p.pos_y - p.last_y;
+                    }
+                    if (p.left == true && p.right == false)
+                    {
+                        p.last_x = p.pos_x;
+                        p.pos_x = p.pos_x - (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.vect_x = p.pos_x - p.last_x;
+                    }
+                    if (p.right == true && p.left == false)
+                    {
+                        p.last_x = p.pos_x;
+                        p.pos_x = p.pos_x + (2 * ((_env.Clock - p.lastUpdate) / 1000));
+                        p.vect_x = p.pos_x - p.last_x;
+                    }
+                }
+
+                if (lastUpdate + 50 < _env.Clock && _players.Count > 0)
                 {
                     lastUpdate = _env.Clock;
                     _scene.Broadcast("update_position", s =>
@@ -208,7 +265,7 @@ namespace Project_EW2D___server
                     foreach (Bullet bullet in Weapons.instance.bullets.Values)
                     {
                         Bullet temp;
-                        if (bullet.lastUpdate + 40000 < _env.Clock)
+                        if (bullet.lastUpdate + 20000 < _env.Clock)
                         {
                             _scene.Broadcast("destroy_bullet", s =>
                             {
@@ -220,7 +277,7 @@ namespace Project_EW2D___server
                         }
                     }
                 }
-                await Task.Delay(100);
+                await Task.Delay(50);
             }
         }
     } 

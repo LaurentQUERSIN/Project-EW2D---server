@@ -109,8 +109,8 @@ namespace Project_EW2D___server
 
             long clock = Weapons.instance.getTime();
 
-            bx = p.pos_x + (float)vx * 1.5f + (p.vect_x * (float)(((clock - p.lastUpdate)) / 50));
-            by = p.pos_y + (float)vy * 1.5f + (p.vect_y * (float)(((clock - p.lastUpdate)) / 50));
+            bx = p.pos_x + (float)vx * 1.5f;// + (p.vect_x * (float)(((clock - p.lastUpdate)) / 50));
+            by = p.pos_y + (float)vy * 1.5f;// + (p.vect_y * (float)(((clock - p.lastUpdate)) / 50));
 
             vx = vx * speed;
             vy = vy * speed;
