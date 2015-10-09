@@ -21,7 +21,7 @@ namespace Project_EW2D___server
 
     public class Weapons
     {
-        private ISceneHost scene { get; set; }
+        private ISceneHost _scene { get; set; }
         public Dictionary<WeaponTypes, Weapon> _weapons;
         public ConcurrentDictionary<long, Bullet> bullets = new ConcurrentDictionary<long, Bullet>();
         public long id = 0;
@@ -31,15 +31,20 @@ namespace Project_EW2D___server
             return _weapons[wp];
         }
 
+        public void setScene(ISceneHost scene)
+        {
+            _scene = scene;
+        }
+
         public long getTime()
         {
-            return scene.GetComponent<IEnvironment>().Clock;
+            return _scene.GetComponent<IEnvironment>().Clock;
         }
 
         public void send(string route, Action<Stream> writer)
         {
-            if (scene != null)
-                scene.Broadcast(route, writer);
+            if (_scene != null)
+                _scene.Broadcast(route, writer);
         }
 
         private static Weapons _instance;
