@@ -101,6 +101,7 @@ namespace Project_EW2D___server
                 sendConnectedPlayersToNewPeer(client);
                 sendConnexionNotification(player);
                 _players.TryAdd(client.Id, new Player(player, _env.Clock));
+
             }
             return Task.FromResult(true);
         }
