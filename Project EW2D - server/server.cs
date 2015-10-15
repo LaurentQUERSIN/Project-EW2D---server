@@ -192,6 +192,8 @@ namespace Project_EW2D___server
                     p.left = true;
                 if (action == 3)
                     p.right = true;
+                if (action == 4)
+                    p.fire = true;
             }
         }
 
@@ -211,6 +213,8 @@ namespace Project_EW2D___server
                     p.left = false;
                 if (action == 3)
                     p.right = false;
+                if (action == 4)
+                    p.fire = false;
             }
         }
 

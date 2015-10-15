@@ -46,6 +46,7 @@ namespace Project_EW2D___server
         public int life = 100;
         public long lastFired = 0;
         public long lastHit = 0;
+        public IScenePeerClient client;
         public StatusTypes status = StatusTypes.ALIVE;
         public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.MACHINE_GUN);
 
@@ -53,6 +54,7 @@ namespace Project_EW2D___server
         public bool down = false;
         public bool left = false;
         public bool right = false;
+        public bool fire = false;
 
         public Player(long pId, string pName, long updateTime)
         {

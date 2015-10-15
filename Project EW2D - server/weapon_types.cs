@@ -116,7 +116,7 @@ namespace Project_EW2D___server
             vy = vy * speed;
 
             long id = Weapons.instance.id;
-            //Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, bx, by, vx, vy, time));
+            Weapons.instance.bullets.TryAdd(id, new Bullet(id, p, bx, by, (float)vx, (float)vy, time));
             Weapons.instance.id++;
             if (Weapons.instance.id > 2000000)
                 Weapons.instance.id = 0;
@@ -188,7 +188,7 @@ namespace Project_EW2D___server
         public WeaponMachineGun()
         {
             name = "machine gun";
-            cooldown = 200;
+            cooldown = 100;
             damage = 10;
             size = 5;
             speed = 4;
@@ -206,7 +206,7 @@ namespace Project_EW2D___server
     {
         public WeaponShotgun()
         {
-            name = "machine gun";
+            name = "shotgun";
             cooldown = 1500;
             damage = 20;
             size = 5;
