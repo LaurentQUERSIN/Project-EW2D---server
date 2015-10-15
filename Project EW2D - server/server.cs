@@ -325,6 +325,7 @@ namespace Project_EW2D___server
                     dist = -dist;
                 if (dist < 1.2f)
                 {
+                    _scene.GetComponent<ILogger>().Debug("main", "A bullet hit a player !");
                     p.life -= b.weapon.damage;
                     if (p.life <= 0)
                     {
