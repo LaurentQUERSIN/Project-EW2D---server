@@ -188,7 +188,7 @@ namespace Project_EW2D___server
         public WeaponMachineGun()
         {
             name = "machine gun";
-            cooldown = 100;
+            cooldown = 200;
             damage = 10;
             size = 5;
             speed = 4;

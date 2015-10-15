@@ -47,7 +47,7 @@ namespace Project_EW2D___server
         public long lastFired = 0;
         public long lastHit = 0;
         public StatusTypes status = StatusTypes.ALIVE;
-        public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.RAPID_FIRE);
+        public Weapon weapon = Weapons.instance.getWeapon(WeaponTypes.MACHINE_GUN);
 
         public bool up = false;
         public bool down = false;
@@ -58,7 +58,7 @@ namespace Project_EW2D___server
         {
             id = pId;
             name = pName;
-            weapon = Weapons.instance.getWeapon(WeaponTypes.RAPID_FIRE);
+            weapon = Weapons.instance.getWeapon(WeaponTypes.MACHINE_GUN);
             lastUpdate = updateTime;
         }
         public Player(myGameObject obj, long updateTime)
