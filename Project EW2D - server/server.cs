@@ -316,8 +316,10 @@ namespace Project_EW2D___server
         {
             foreach (Bullet b in _bullets.Values)
             {
-                double x = Math.Pow(p.pos_x - b.pos_x, 2);
-                double y = Math.Pow(p.pos_y - b.pos_y, 2);
+                var bullet_x = b.pos_x + (b.vect_x * (_env.Clock - b.lastUpdate) / 1000);
+                var bullet_y = b.pos_y + (b.vect_y * (_env.Clock - b.lastUpdate) / 1000);
+                double x = Math.Pow(p.pos_x - (double)bullet_x, 2);
+                double y = Math.Pow(p.pos_y - (double)bullet_y, 2);
                 var dist = Math.Sqrt(x + y);
                 if (dist < 0)
                     dist = -dist;
