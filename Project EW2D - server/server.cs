@@ -203,7 +203,7 @@ namespace Project_EW2D___server
             var action = reader.ReadInt32();
 
             Player p;
-            if (_players.TryGetValue(packet.Connection.Id, out p) == true)
+            if (_players.TryGetValue(packet.Connection.Id, out p) == true && p.status == StatusTypes.ALIVE)
             {
                 if (action == 0)
                     p.up = false;
@@ -223,73 +223,120 @@ namespace Project_EW2D___server
             float deltaTime = (float)(_env.Clock - lastUpdate) / 1000f;
             foreach (Player p in _players.Values)
             {
-                if (p.up == true && p.down == false)
+                if (p.status == StatusTypes.ALIVE)
                 {
-                    p.vect_y += 0.25f * deltaTime;
-                }
-                if (p.down == true && p.up == false)
-                {
-                    p.vect_y -= 0.25f * deltaTime;
-                }
-                if ((p.up == false && p.down == false) || (p.up == true && p.down == true))
-                {
-                    if (-0.05f < p.vect_y && p.vect_y < 0.05f)
-                        p.vect_y = 0;
-                    else if (p.vect_y > 0)
-                        p.vect_y -= 0.1f * deltaTime;
-                    else if (p.vect_y < 0)
-                        p.vect_y += 0.1f * deltaTime;
-                }
-                if (p.vect_y > 0.75f)
-                    p.vect_y = 0.75f;
-                if (p.vect_y < -0.75f)
-                    p.vect_y = -0.75f;
+                    if (p.up == true && p.down == false)
+                    {
+                        p.vect_y += 0.25f * deltaTime;
+                    }
+                    if (p.down == true && p.up == false)
+                    {
+                        p.vect_y -= 0.25f * deltaTime;
+                    }
+                    if ((p.up == false && p.down == false) || (p.up == true && p.down == true))
+                    {
+                        if (-0.05f < p.vect_y && p.vect_y < 0.05f)
+                            p.vect_y = 0;
+                        else if (p.vect_y > 0)
+                            p.vect_y -= 0.1f * deltaTime;
+                        else if (p.vect_y < 0)
+                            p.vect_y += 0.1f * deltaTime;
+                    }
+                    if (p.vect_y > 0.5f)
+                        p.vect_y = 0.5f;
+                    if (p.vect_y < -0.5f)
+                        p.vect_y = -0.5f;
 
-                if (p.left == true && p.right == false)
-                {
-                    p.vect_x -= 0.25f * deltaTime;
-                }
-                if (p.right == true && p.left == false)
-                {
-                    p.vect_x += 0.25f * deltaTime;
-                }
-                if ((p.left == false && p.right == false) || (p.left == true && p.right == true))
-                {
-                    if (-0.05f < p.vect_x && p.vect_x < 0.05f)
+                    if (p.left == true && p.right == false)
+                    {
+                        p.vect_x -= 0.25f * deltaTime;
+                    }
+                    if (p.right == true && p.left == false)
+                    {
+                        p.vect_x += 0.25f * deltaTime;
+                    }
+                    if ((p.left == false && p.right == false) || (p.left == true && p.right == true))
+                    {
+                        if (-0.05f < p.vect_x && p.vect_x < 0.05f)
+                            p.vect_x = 0;
+                        else if (p.vect_x > 0)
+                            p.vect_x -= 0.1f * deltaTime;
+                        else if (p.vect_x < 0)
+                            p.vect_x += 0.1f * deltaTime;
+                    }
+                    if (p.vect_x > 0.5f)
+                        p.vect_x = 0.5f;
+                    if (p.vect_x < -0.5f)
+                        p.vect_x = -0.5f;
+
+                    p.pos_x += p.vect_x;
+                    p.pos_y += p.vect_y;
+                    if (p.pos_x < -150)
+                    {
+                        p.pos_x = -150;
                         p.vect_x = 0;
-                    else if (p.vect_x > 0)
-                        p.vect_x -= 0.1f * deltaTime;
-                    else if (p.vect_x < 0)
-                        p.vect_x += 0.1f * deltaTime;
+                    }
+                    if (p.pos_x > 150)
+                    {
+                        p.pos_x = 150;
+                        p.vect_x = 0;
+                    }
+                    if (p.pos_y < -100)
+                    {
+                        p.pos_y = -100;
+                        p.vect_y = 0;
+                    }
+                    if (p.pos_y > 100)
+                    {
+                        p.pos_y = 100;
+                        p.vect_y = 0;
+                    }
+                    CheckIfBulletCollideWithPlayers(p);
                 }
-                if (p.vect_x > 0.75f)
-                    p.vect_x = 0.75f;
-                if (p.vect_x < -0.75f)
-                    p.vect_x = -0.75f;
+                else if (p.status == StatusTypes.DEAD)
+                {
+                    if (p.lastHit + 5000 < _env.Clock)
+                    {
+                        p.status = StatusTypes.ALIVE;
+                        _scene.Broadcast("update_status", s =>
+                        {
+                            using (var w = new BinaryWriter(s, Encoding.UTF8, false))
+                            {
+                                w.Write(p.id);
+                                w.Write(1);
+                            }
+                        }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                    }
+                }
+            }
+        }
 
-                p.pos_x += p.vect_x;
-                p.pos_y += p.vect_y;
-                if (p.pos_x < -150)
+        private void CheckIfBulletCollideWithPlayers(Player p)
+        {
+            foreach (Bullet b in _bullets.Values)
+            {
+                double x = Math.Pow(p.pos_x - b.pos_x, 2);
+                double y = Math.Pow(p.pos_y - b.pos_y, 2);
+                var dist = Math.Sqrt(x + y);
+                if (dist < 0)
+                    dist = -dist;
+                if (dist < 1.2f)
                 {
-                    p.pos_x = -150;
-                    p.vect_x = 0;
+                    p.life -= b.weapon.damage;
+                    if (p.life <= 0)
+                    {
+                        p.lastHit = _env.Clock;
+                        p.status = StatusTypes.DEAD;
+                        _scene.Broadcast("update_status", s =>
+                        {
+                            using (var w = new BinaryWriter(s, Encoding.UTF8, false))
+                            {
+                                w.Write(p.id);
+                                w.Write(1);
+                            }
+                        }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                    }
                 }
-                if (p.pos_x > 150)
-                {
-                    p.pos_x = 150;
-                    p.vect_x = 0;
-                }
-                if (p.pos_y < -100)
-                {
-                    p.pos_y = -100;
-                    p.vect_y = 0;
-                }
-                if (p.pos_y > 100)
-                {
-                    p.pos_y = 100;
-                    p.vect_y = 0;
-                }
-
             }
         }
 
