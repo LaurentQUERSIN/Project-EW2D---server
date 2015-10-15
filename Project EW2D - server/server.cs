@@ -221,20 +221,20 @@ namespace Project_EW2D___server
             {
                 if (p.up == true && p.down == false)
                 {
-                    p.vect_y += 0.05f * deltaTime;
+                    p.vect_y += 0.5f * deltaTime;
                 }
                 if (p.down == true && p.up == false)
                 {
-                    p.vect_y -= 0.05f * deltaTime;
+                    p.vect_y -= 0.5f * deltaTime;
                 }
                 if ((p.up == false && p.down == false) || (p.up == true && p.down == true))
                 {
                     if (-0.05f < p.vect_y && p.vect_y < 0.05f)
                         p.vect_y = 0;
                     else if (p.vect_y > 0)
-                        p.vect_y -= 0.01f * deltaTime;
+                        p.vect_y -= 0.1f * deltaTime;
                     else if (p.vect_y < 0)
-                        p.vect_y += 0.01f * deltaTime;
+                        p.vect_y += 0.1f * deltaTime;
                 }
                 if (p.vect_y > 1f)
                     p.vect_y = 1f;
@@ -243,20 +243,20 @@ namespace Project_EW2D___server
 
                 if (p.left == true && p.right == false)
                 {
-                    p.vect_x -= 0.05f * deltaTime;
+                    p.vect_x -= 0.5f * deltaTime;
                 }
                 if (p.right == true && p.left == false)
                 {
-                    p.vect_x += 0.05f * deltaTime;
+                    p.vect_x += 0.5f * deltaTime;
                 }
                 if ((p.left == false && p.right == false) || (p.left == true && p.right == true))
                 {
                     if (-0.05f < p.vect_x && p.vect_x < 0.05f)
                         p.vect_x = 0;
                     else if (p.vect_x > 0)
-                        p.vect_x -= 0.01f * deltaTime;
+                        p.vect_x -= 0.1f * deltaTime;
                     else if (p.vect_x < 0)
-                        p.vect_x += 0.01f * deltaTime;
+                        p.vect_x += 0.1f * deltaTime;
                 }
                 if (p.vect_x > 1f)
                     p.vect_x = 1f;
