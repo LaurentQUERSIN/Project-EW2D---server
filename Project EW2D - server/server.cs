@@ -323,7 +323,7 @@ namespace Project_EW2D___server
                 var dist = Math.Sqrt(x + y);
                 if (dist < 0)
                     dist = -dist;
-                if (dist < 1.2f)
+                if (dist < 5.0f)
                 {
                     _scene.GetComponent<ILogger>().Debug("main", "A bullet hit a player !");
                     p.life -= b.weapon.damage;
@@ -360,9 +360,12 @@ namespace Project_EW2D___server
                         var writer = new BinaryWriter(s, Encoding.UTF8, true);
                         foreach (Player p in _players.Values)
                         {
-                                writer.Write(p.id);
-                                writer.Write(p.pos_x);
-                                writer.Write(p.pos_y);
+                            writer.Write(p.id);
+                            writer.Write(p.pos_x);
+                            writer.Write(p.pos_y);
+                            writer.Write(p.vect_x);
+                            writer.Write(p.vect_y);
+                            writer.Write(_env.Clock);
                          }
                     }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.UNRELIABLE_SEQUENCED);
                     foreach (Bullet bullet in Weapons.instance.bullets.Values)
