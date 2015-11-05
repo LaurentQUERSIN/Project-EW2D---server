@@ -270,8 +270,8 @@ namespace Project_EW2D___server
                     if (p.vect_x < -0.5f)
                         p.vect_x = -0.5f;
 
-                    p.pos_x += p.vect_x;
-                    p.pos_y += p.vect_y;
+                    p.pos_x += p.vect_x * deltaTime;
+                    p.pos_y += p.vect_y * deltaTime;
                     if (p.pos_x < -150)
                     {
                         p.pos_x = -150;
@@ -316,8 +316,8 @@ namespace Project_EW2D___server
         {
             foreach (Bullet b in _bullets.Values)
             {
-                var bullet_x = b.pos_x + (b.vect_x * (_env.Clock - b.lastUpdate) / 1000);
-                var bullet_y = b.pos_y + (b.vect_y * (_env.Clock - b.lastUpdate) / 1000);
+                var bullet_x = b.pos_x + (b.vect_x * (_env.Clock - b.lastUpdate) / 1000f);
+                var bullet_y = b.pos_y + (b.vect_y * (_env.Clock - b.lastUpdate) / 1000f);
                 double x = Math.Pow(p.pos_x - (double)bullet_x, 2);
                 double y = Math.Pow(p.pos_y - (double)bullet_y, 2);
                 var dist = Math.Sqrt(x + y);
